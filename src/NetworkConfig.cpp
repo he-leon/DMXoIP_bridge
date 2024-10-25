@@ -27,6 +27,8 @@ void setupWiFiManager() {
   wm.addParameter(&custom_startAddress);
   wm.addParameter(&custom_deviceName);
 
+  WiFi.hostname(deviceName.c_str());
+
   wm.setAPCallback([](WiFiManager *myWiFiManager) {
     Serial.println("Entered config mode");
     Serial.println(WiFi.softAPIP());
@@ -44,7 +46,7 @@ void setupWiFiManager() {
   if (WiFi.status() == WL_CONNECTED) {
     blinkGreenTwice();
     wm.setConfigPortalBlocking(false);
-    wm.startConfigPortal();
+    wm.startConfigPortal(deviceName.c_str());
   }
 
   if (!MDNS.begin(deviceName.c_str())) {
