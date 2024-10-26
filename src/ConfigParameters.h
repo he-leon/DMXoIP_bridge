@@ -1,4 +1,3 @@
-
 #ifndef CONFIGPARAMETERS_H
 #define CONFIGPARAMETERS_H
 

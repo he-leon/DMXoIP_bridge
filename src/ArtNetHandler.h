@@ -1,4 +1,3 @@
-
 #ifndef ARTNETHANDLER_H
 #define ARTNETHANDLER_H
 
