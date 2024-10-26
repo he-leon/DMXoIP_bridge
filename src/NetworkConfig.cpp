@@ -15,6 +15,27 @@ void saveConfigCallback() {
   savePreferences();
 }
 
+void handleMonitor(){
+  String totalPowerString;
+  totalPowerString = String(totalPower);
+  wm.server->send(200, "text/plain", totalPowerString.c_str());
+}
+
+void bindServerCallback(){
+  wm.server->on("/monitor",handleMonitor); 
+}
+
+void setupMenu(){
+  wm.setWebServerCallback(bindServerCallback);
+
+  std::vector<const char *> menu = {"wifi","info","param","custom","close","sep","erase","update","restart","exit"};
+  wm.setMenu(menu); // custom menu, pass vector
+
+  // set custom html menu content, inside menu item custom
+  const char* menuhtml = "<form action='/monitor' method='get'><button>Monitor</button></form><br/>\n";
+  wm.setCustomMenuHTML(menuhtml);
+}
+
 void setupWiFiManager() {
   
   custom_numLeds.setValue(String(numLeds).c_str(), 5);
@@ -29,6 +50,8 @@ void setupWiFiManager() {
 
   WiFi.hostname(deviceName.c_str());
 
+  setupMenu();
+ 
   wm.setAPCallback([](WiFiManager *myWiFiManager) {
     Serial.println("Entered config mode");
     Serial.println(WiFi.softAPIP());

@@ -7,6 +7,9 @@ void setupOTA();
 void handleWiFiManager();
 void handleOTA();
 void saveConfigCallback();
+void setupMenu();
+void handleMonitor();
+void bindServerCallback();
 
 #endif // NETWORKCONFIG_H
 

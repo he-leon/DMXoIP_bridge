@@ -1,7 +1,9 @@
 
 #include <FastLED.h>
 #include "ConfigParameters.h"
+#include "LEDConfig.h"
 
+float totalPower = 0.0;  // Define totalPower here
 CRGB* leds;
 
 void setupLEDs() {
@@ -29,5 +31,22 @@ void blinkGreenTwice() {
     setLEDColor(CRGB::Black);
     delay(500);
   }
+}
+
+void calculatePowerUsage() {
+    totalPower = 0.0;
+    for (int i = 0; i < numLeds; i++) {
+        float redPower = leds[i].r / 255.0 * RED_POWER;
+        float greenPower = leds[i].g / 255.0 * GREEN_POWER;
+        float bluePower = leds[i].b / 255.0 * BLUE_POWER;
+        totalPower += redPower + greenPower + bluePower;
+    }
+
+    // Adjust for global brightness setting
+    totalPower *= FastLED.getBrightness() / 255.0;
+
+    Serial.print("Current power usage: ");
+    Serial.print(totalPower);
+    Serial.println(" W");
 }
 
