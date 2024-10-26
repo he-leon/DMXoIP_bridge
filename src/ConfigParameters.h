@@ -3,7 +3,7 @@
 #define CONFIGPARAMETERS_H
 
 #include <WiFiManager.h>
-#include <Preferences.h>
+
 #include "WiFiConfig.h"
 
 #define LED_PIN 5
@@ -22,10 +22,7 @@ extern WiFiManagerParameter custom_universe;
 extern WiFiManagerParameter custom_startAddress;
 extern WiFiManagerParameter custom_deviceName;
 
-// Preferences
-extern Preferences preferences;
-
-void initializePreferences(); // Add this line
+void initializePreferences();  // Add this line
 void loadPreferences();
 void savePreferences();
 void loadWiFiConfigs();
@@ -34,5 +31,4 @@ void addWiFiConfig(const String &ssid, const String &password, int priority);
 
 extern std::vector<WiFiConfig> wifiConfigs;
 
-#endif // CONFIGPARAMETERS_H
-
+#endif  // CONFIGPARAMETERS_H

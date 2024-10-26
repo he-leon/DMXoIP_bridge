@@ -11,8 +11,7 @@ void setupLEDs();
 void setLEDColor(CRGB color);
 void setBrightness(uint8_t brightness);
 void blinkGreenTwice();
-void calculatePowerUsage();  
+void calculatePowerUsage();
 extern float totalPower;
 
-#endif // LEDCONFIG_H
-
+#endif  // LEDCONFIG_H

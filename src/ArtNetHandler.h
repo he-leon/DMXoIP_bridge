@@ -7,5 +7,4 @@
 void setupArtNet();
 void readArtNet();
 
-#endif // ARTNETHANDLER_H
-
+#endif  // ARTNETHANDLER_H

@@ -1,38 +1,50 @@
 
 #include "ConfigParameters.h"
+
 #include <ArduinoJson.h>
 #include <SPIFFS.h>
 
-int numLeds = 30;
-int universe = 0;
-int startAddress = 2;
-String chipID = String((uint32_t)ESP.getEfuseMac(), HEX);
-String defaultDeviceName = "ESP32-" + chipID;
-String deviceName = defaultDeviceName;
+int numLeds                = 30;
+int universe               = 0;
+int startAddress           = 2;
+String chipID              = String((uint32_t) ESP.getEfuseMac(), HEX);
+String defaultDeviceName   = "ESP32-" + chipID;
+String deviceName          = defaultDeviceName;
 const char *configFilePath = "/config.json";
 
-std::vector<WiFiConfig> wifiConfigs; // Holds multiple Wi-Fi configurations
+std::vector<WiFiConfig> wifiConfigs;  // Holds multiple Wi-Fi configurations
 const char *wifiConfigFilePath = "/wifi_config.json";
 
-WiFiManagerParameter custom_numLeds("numLeds", "Number of LEDs",
-                                    String(numLeds).c_str(), 5);
-WiFiManagerParameter custom_universe("universe", "Art-Net Universe",
-                                     String(universe).c_str(), 5);
-WiFiManagerParameter custom_startAddress("startAddress", "Start Address",
-                                         String(startAddress).c_str(), 5);
-WiFiManagerParameter custom_deviceName("deviceName", "Device Name",
-                                       defaultDeviceName.c_str(), 32);
+WiFiManagerParameter custom_numLeds("numLeds",
+                                    "Number of LEDs",
+                                    String(numLeds).c_str(),
+                                    5);
+WiFiManagerParameter custom_universe("universe",
+                                     "Art-Net Universe",
+                                     String(universe).c_str(),
+                                     5);
+WiFiManagerParameter custom_startAddress("startAddress",
+                                         "Start Address",
+                                         String(startAddress).c_str(),
+                                         5);
+WiFiManagerParameter custom_deviceName("deviceName",
+                                       "Device Name",
+                                       defaultDeviceName.c_str(),
+                                       32);
 
-void loadWiFiConfigs() {
+void loadWiFiConfigs()
+{
   File configFile = SPIFFS.open(wifiConfigFilePath, FILE_READ);
-  if (!configFile) {
+  if (!configFile)
+  {
     Serial.println("No Wi-Fi config file found, using defaults");
     return;
   }
 
   DynamicJsonDocument doc(1024);
   DeserializationError error = deserializeJson(doc, configFile);
-  if (error) {
+  if (error)
+  {
     Serial.println("Failed to read Wi-Fi config file, using defaults");
     return;
   }
@@ -42,9 +54,10 @@ void loadWiFiConfigs() {
 
   // Load configurations from JSON array
   JsonArray array = doc["wifiConfigs"].as<JsonArray>();
-  for (JsonObject obj : array) {
+  for (JsonObject obj : array)
+  {
     WiFiConfig config;
-    config.ssid = obj["ssid"].as<String>();
+    config.ssid     = obj["ssid"].as<String>();
     config.password = obj["password"].as<String>();
     config.priority = obj["priority"] | 0;
     wifiConfigs.push_back(config);
@@ -53,16 +66,19 @@ void loadWiFiConfigs() {
   configFile.close();
   Serial.println("Wi-Fi configurations loaded:");
   // Print wifi config
-  for (const auto &config : wifiConfigs) {
+  for (const auto &config : wifiConfigs)
+  {
     Serial.println("SSID: " + config.ssid);
     Serial.println("Password: " + config.password);
     Serial.println("Priority: " + String(config.priority));
   }
 }
 
-void saveWiFiConfigs() {
+void saveWiFiConfigs()
+{
   File configFile = SPIFFS.open(wifiConfigFilePath, FILE_WRITE);
-  if (!configFile) {
+  if (!configFile)
+  {
     Serial.println("Failed to open Wi-Fi config file for writing");
     return;
   }
@@ -70,9 +86,10 @@ void saveWiFiConfigs() {
   DynamicJsonDocument doc(1024);
   JsonArray array = doc.createNestedArray("wifiConfigs");
 
-  for (const auto &config : wifiConfigs) {
-    JsonObject obj = array.createNestedObject();
-    obj["ssid"] = config.ssid;
+  for (const auto &config : wifiConfigs)
+  {
+    JsonObject obj  = array.createNestedObject();
+    obj["ssid"]     = config.ssid;
     obj["password"] = config.password;
     obj["priority"] = config.priority;
   }
@@ -82,17 +99,19 @@ void saveWiFiConfigs() {
   Serial.println("Wi-Fi configurations saved.");
 }
 
-void addWiFiConfig(const String &ssid, const String &password,
-                   int priority = 0) {
+void addWiFiConfig(const String &ssid, const String &password, int priority = 0)
+{
   WiFiConfig newConfig;
-  newConfig.ssid = ssid;
+  newConfig.ssid     = ssid;
   newConfig.password = password;
   newConfig.priority = priority;
 
   // Check if SSID already exists, then update; otherwise, add new
   bool exists = false;
-  for (auto &config : wifiConfigs) {
-    if (config.ssid == ssid) {
+  for (auto &config : wifiConfigs)
+  {
+    if (config.ssid == ssid)
+    {
       config = newConfig;
       exists = true;
       break;
@@ -102,27 +121,31 @@ void addWiFiConfig(const String &ssid, const String &password,
   if (!exists)
     wifiConfigs.push_back(newConfig);
 
-  saveWiFiConfigs(); // Save updated configurations to SPIFFS
+  saveWiFiConfigs();  // Save updated configurations to SPIFFS
 }
 
-void initializePreferences() {
+void initializePreferences()
+{
   Serial.println("Initializing preferences...");
   loadWiFiConfigs();
   loadPreferences();
 }
 
-void loadPreferences() {
+void loadPreferences()
+{
   Serial.println("Loading preferences from SPIFFS...");
 
   File configFile = SPIFFS.open(configFilePath, FILE_READ);
 
-  if (!configFile) {
+  if (!configFile)
+  {
     Serial.println("Failed to open config file, using defaults");
     return;
   }
 
   size_t size = configFile.size();
-  if (size > 1024) {
+  if (size > 1024)
+  {
     Serial.println("Config file size is too large");
     configFile.close();
     return;
@@ -135,13 +158,16 @@ void loadPreferences() {
   // Parse JSON
   DynamicJsonDocument json(1024);
   DeserializationError error = deserializeJson(json, buf.get());
-  if (error) {
+  if (error)
+  {
     Serial.println("Failed to parse config file, using defaults");
-  } else {
-    numLeds = json["numLeds"] | 30;
-    universe = json["universe"] | 0;
+  }
+  else
+  {
+    numLeds      = json["numLeds"] | 30;
+    universe     = json["universe"] | 0;
     startAddress = json["startAddress"] | 2;
-    deviceName = json["deviceName"] | defaultDeviceName;
+    deviceName   = json["deviceName"] | defaultDeviceName;
   }
 
   configFile.close();
@@ -152,7 +178,8 @@ void loadPreferences() {
   Serial.println("deviceName: " + deviceName);
 }
 
-void savePreferences() {
+void savePreferences()
+{
   Serial.println("Saving preferences...");
   Serial.println("numLeds: " + String(numLeds));
   Serial.println("universe: " + String(universe));
@@ -160,15 +187,20 @@ void savePreferences() {
   Serial.println("deviceName: " + deviceName);
   Serial.println("Saving preferences to SPIFFS...");
   File configFile = SPIFFS.open(configFilePath, FILE_WRITE);
-  if (!configFile) {
+  if (!configFile)
+  {
     Serial.println("Failed to open config file for writing");
     return;
   }
 
   // Write settings as JSON format
-  configFile.printf("{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, "
-                    "\"deviceName\": \"%s\"}\n",
-                    numLeds, universe, startAddress, deviceName.c_str());
+  configFile.printf(
+      "{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, "
+      "\"deviceName\": \"%s\"}\n",
+      numLeds,
+      universe,
+      startAddress,
+      deviceName.c_str());
   configFile.close();
 
   Serial.println("Preferences saved.");

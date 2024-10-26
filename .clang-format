@@ -1,0 +1,74 @@
+# .clang-format for Arduino
+
+---
+# Basic formatting style, inherits from Google style and customizes for Arduino conventions
+BasedOnStyle: Google
+IndentWidth: 2         # Arduino often uses 2 spaces for indentation
+TabWidth: 2            # Width of a tab character
+UseTab: Never          # Prefer spaces over tabs
+
+# Control braces placement (use Allman style for braces)
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+
+# Align pointer/reference symbols with variable names (Arduino style often prefers this)
+PointerAlignment: Right
+ReferenceAlignment: Right
+
+# Align assignments in consecutive lines to make reading values easier
+AlignConsecutiveAssignments: true
+
+# Control formatting for C-style and inline comments
+CommentPragmas: '^(@brief|@param|@return)'
+BreakBeforeBraces: Allman
+AllowShortBlocksOnASingleLine: false
+
+# Control spacing around operators and expressions for readability
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: true
+SpacesInAngles: false
+SpaceInEmptyParentheses: false
+SpacesInContainerLiterals: false
+
+# Ensure code structures are consistently formatted
+IndentCaseLabels: false
+IndentPPDirectives: None
+IndentGotoLabels: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# Control column limit and line breaking for longer code lines
+ColumnLimit: 90
+ReflowComments: true  # Reflow comments to match ColumnLimit
+
+# For sorting #includes, use case-sensitive sorting
+SortIncludes: true
+IncludeCategories:
+  - Regex: '^<Arduino\.h>'
+    Priority: 1
+  - Regex: '^<'
+    Priority: 2
+  - Regex: '^"'
+    Priority: 3
+  - Regex: '.*'
+    Priority: 4
+
+Cpp11BracedListStyle: true
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+# Improve readability by wrapping logical units in separate lines
+BreakBeforeBinaryOperators: All
+BreakConstructorInitializers: BeforeComma
+AlignTrailingComments: true
+BinPackArguments: false
+BinPackParameters: false
+
+
