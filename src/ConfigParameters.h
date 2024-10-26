@@ -4,6 +4,7 @@
 
 #include <WiFiManager.h>
 #include <Preferences.h>
+#include "WiFiConfig.h"
 
 #define LED_PIN 5
 #define DEFAULT_BRIGHTNESS 50
@@ -27,6 +28,11 @@ extern Preferences preferences;
 void initializePreferences(); // Add this line
 void loadPreferences();
 void savePreferences();
+void loadWiFiConfigs();
+void saveWiFiConfigs();
+void addWiFiConfig(const String &ssid, const String &password, int priority);
+
+extern std::vector<WiFiConfig> wifiConfigs;
 
 #endif // CONFIGPARAMETERS_H
 

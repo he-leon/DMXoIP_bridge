@@ -37,7 +37,7 @@ void setupMenu(){
 }
 
 void setupWiFiManager() {
-  
+ 
   custom_numLeds.setValue(String(numLeds).c_str(), 5);
   custom_universe.setValue(String(universe).c_str(), 5);
   custom_startAddress.setValue(String(startAddress).c_str(), 5);
@@ -51,6 +51,52 @@ void setupWiFiManager() {
   WiFi.hostname(deviceName.c_str());
 
   setupMenu();
+
+    Serial.println("Connecting to saved Wi-Fi networks...");
+
+    // Sort Wi-Fi configurations by priority (higher first)
+    std::sort(wifiConfigs.begin(), wifiConfigs.end(), [](WiFiConfig &a, WiFiConfig &b) {
+        return a.priority > b.priority;
+    });
+
+    for (const auto &config : wifiConfigs) {
+        Serial.print("Trying to connect to: ");
+        Serial.println(config.ssid);
+        
+        WiFi.begin(config.ssid.c_str(), config.password.c_str());
+
+        // Wait up to 10 seconds for connection
+        unsigned long startAttemptTime = millis();
+        while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < 10000) {
+            delay(100);
+        }
+
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.print("Connected to ");
+            Serial.println(config.ssid);
+            blinkGreenTwice();
+            wm.setAPCallback([](WiFiManager *myWiFiManager) {
+              Serial.println("Started non-blocking webinterface in STA mode.");
+            });
+            wm.setConfigPortalBlocking(false);
+            wm.startConfigPortal(deviceName.c_str());
+
+            if (!MDNS.begin(deviceName.c_str())) {
+              Serial.println("Error setting up MDNS responder!");
+            } else {
+              Serial.println("mDNS responder started");
+              MDNS.addService("http", "tcp", 80);
+            }
+            return;  // Exit if connected
+        } else {
+            Serial.print("Failed to connect to ");
+            Serial.println(config.ssid);
+        }
+   }
+
+    // If no saved network connects, start WiFiManager to configure a new one
+  Serial.println("No saved networks connected. Starting WiFiManager...");
+ 
  
   wm.setAPCallback([](WiFiManager *myWiFiManager) {
     Serial.println("Entered config mode");
@@ -60,25 +106,21 @@ void setupWiFiManager() {
   });
 
   wm.setSaveParamsCallback(saveConfigCallback);
-  wm.autoConnect(deviceName.c_str());
+  wm.setSaveConfigCallback([]() {
+        Serial.println("WiFiManager portal saved new Wi-Fi credentials.");
 
-  wm.setAPCallback([](WiFiManager *myWiFiManager) {
-    Serial.println("Started non-blocking webinterface in STA mode.");
-  });
+        // Store connected network in the configs
+        WiFiConfig newConfig;
+        newConfig.ssid = WiFi.SSID();
+        newConfig.password = WiFi.psk();
+        newConfig.priority = 0;  // Default priority for new networks
+        addWiFiConfig(newConfig.ssid, newConfig.password, newConfig.priority);
+        ESP.restart();
+        
 
-  if (WiFi.status() == WL_CONNECTED) {
-    blinkGreenTwice();
-    wm.setConfigPortalBlocking(false);
-    wm.startConfigPortal(deviceName.c_str());
+    });
+  wm.startConfigPortal(deviceName.c_str());
   }
-
-  if (!MDNS.begin(deviceName.c_str())) {
-    Serial.println("Error setting up MDNS responder!");
-  } else {
-    Serial.println("mDNS responder started");
-    MDNS.addService("http", "tcp", 80);
-  }
-}
 
 void setupOTA() {
   ArduinoOTA.setHostname(deviceName.c_str());
