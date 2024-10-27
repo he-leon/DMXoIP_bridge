@@ -89,6 +89,12 @@ void setupWiFiManager()
     if (WiFi.status() == WL_CONNECTED)
     {
       Serial.print("Connected to ");
+      if (config.priority == 0)
+      {
+        // Setting priority to 1 so that this network is preferred next time
+        addWiFiConfig(config.ssid, config.password, 1);
+        saveWiFiConfigs();
+      }
       Serial.println(config.ssid);
       blinkGreenTwice();
       wm.setAPCallback(
@@ -112,6 +118,9 @@ void setupWiFiManager()
     {
       Serial.print("Failed to connect to ");
       Serial.println(config.ssid);
+      // Set priority to 0 for non-available networks
+      // Will be saved if connected to a network eventually
+      addWiFiConfig(config.ssid, config.password, 0);
     }
   }
 
