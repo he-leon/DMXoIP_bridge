@@ -94,6 +94,9 @@ cat > "$DATA_DIR/config.json" << EOF
 }
 EOF
 
+# Escape \ in SSID
+WIFI_SSID=$(echo "$WIFI_SSID" | sed 's/\\/\\\\/g')
+
 # Generate wifi_config.json
 echo "Generating wifi_config.json..."
 cat > "$DATA_DIR/wifi_config.json" << EOF
