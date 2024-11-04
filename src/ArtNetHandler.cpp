@@ -12,6 +12,10 @@ void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *d
 {
   if (universe == ::universe)
   {
+    if (startAddress-1 < 0)
+    {
+      return;
+    } 
     uint8_t brightness = data[startAddress-1];
     CRGB color         = CRGB::Black;
 
