@@ -1,41 +1,52 @@
-
 #include "LEDConfig.h"
-
-#include <FastLED.h>
-
 #include "ConfigParameters.h"
 
-float totalPower = 0.0;  // Define totalPower here
-CRGB *leds;
+#define LED_PIN 5  // Replace or keep depending on your setup
+
+// Use RMT with 800kHz timing (standard for WS2812)
+NeoPixelBus<NeoGrbFeature, NeoEsp32Rmt0800KbpsMethod> strip(numLeds, LED_PIN);
+
+
+float totalPower = 0.0;
+
+// Store current brightness separately, since NeoPixelBus handles brightness differently
+static uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
 
 void setupLEDs()
 {
-  leds = new CRGB[numLeds];
-  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, numLeds)
-      .setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(DEFAULT_BRIGHTNESS);
-  fill_solid(leds, numLeds, CRGB::Black);
-  FastLED.show();
+  strip.Begin();
+  strip.Show();  // Initialize all LEDs off
 }
 
-void setLEDColor(CRGB color)
+void setLEDColor(RgbColor color)
 {
-  fill_solid(leds, numLeds, color);
+  RgbColor scaledColor = color;
+  scaledColor.Dim(currentBrightness);  // Apply brightness scaling
+
+  for (int i = 0; i < numLeds; i++)
+  {
+    strip.SetPixelColor(i, scaledColor);
+  }
+
+  strip.Show();
 }
 
 void setBrightness(uint8_t brightness)
 {
-  FastLED.setBrightness(brightness);
-  FastLED.show();
+  currentBrightness = brightness;
+  // Brightness is applied during setLEDColor() via Dim()
 }
 
 void blinkGreenTwice()
 {
+  RgbColor green(0, 255, 0);
+  RgbColor off(0);
+
   for (int i = 0; i < 2; i++)
   {
-    setLEDColor(CRGB::Green);
+    setLEDColor(green);
     delay(500);
-    setLEDColor(CRGB::Black);
+    setLEDColor(off);
     delay(500);
   }
 }
@@ -43,18 +54,21 @@ void blinkGreenTwice()
 void calculatePowerUsage()
 {
   totalPower = 0.0;
+
   for (int i = 0; i < numLeds; i++)
   {
-    float redPower   = leds[i].r / 255.0 * RED_POWER;
-    float greenPower = leds[i].g / 255.0 * GREEN_POWER;
-    float bluePower  = leds[i].b / 255.0 * BLUE_POWER;
+    RgbColor color = strip.GetPixelColor(i);
+    float redPower   = color.R / 255.0 * RED_POWER;
+    float greenPower = color.G / 255.0 * GREEN_POWER;
+    float bluePower  = color.B / 255.0 * BLUE_POWER;
     totalPower += redPower + greenPower + bluePower;
   }
 
-  // Adjust for global brightness setting
-  totalPower *= FastLED.getBrightness() / 255.0;
+  // Scale by brightness level (which was pre-applied)
+  totalPower *= currentBrightness / 255.0;
 
   Serial.print("Current power usage: ");
   Serial.print(totalPower);
   Serial.println(" W");
 }
+

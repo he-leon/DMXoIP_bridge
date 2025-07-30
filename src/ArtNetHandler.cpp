@@ -1,49 +1,42 @@
-
 #include <ArtnetWifi.h>
-
 #include "ConfigParameters.h"
 #include "LEDConfig.h"
 
 ArtnetWifi artnet;
-CRGB currentColor;
-uint8_t currentBrightness;
 
-void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *data)
+RgbColor currentColor(0);
+uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
+
+void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data)
 {
-  if (universe == ::universe)
-  {
-    if (startAddress - 1 < 0)
-    {
-      return;
-    }
-    uint8_t brightness = data[startAddress - 1];
-    CRGB color         = CRGB::Black;
+  if (universeIn != ::universe)
+    return;
 
-    if ((startAddress - 1 + 2) < length)
-    {
-      color = CRGB(data[startAddress], data[startAddress + 1], data[startAddress + 2]);
-    }
-    bool needsUpdate = false;
+  if (startAddress - 1 < 0 || (startAddress - 1 + 2) >= length)
+    return;
 
-    if (currentBrightness != brightness)
-    {
-      currentBrightness = brightness;
-      FastLED.setBrightness(brightness);  // Don't call show() here
-      needsUpdate = true;
-    }
+  uint8_t brightness = data[startAddress - 1];
+  RgbColor color(
+    data[startAddress],         // Red
+    data[startAddress + 1],     // Green
+    data[startAddress + 2]);    // Blue
 
-    if (currentColor != color)
-    {
-      currentColor = color;
-      setLEDColor(color);  // Don't call show() here
-      needsUpdate = true;
-    }
+  bool needsUpdate = false;
 
-    if (needsUpdate)
-    {
-      FastLED.show();
-      calculatePowerUsage();
-    }
+  if (brightness != currentBrightness) {
+    currentBrightness = brightness;
+    setBrightness(brightness);
+    needsUpdate = true;
+  }
+
+  if (color != currentColor) {
+    currentColor = color;
+    setLEDColor(color);
+    needsUpdate = true;
+  }
+
+  if (needsUpdate) {
+    calculatePowerUsage();
   }
 }
 
@@ -54,4 +47,8 @@ void setupArtNet()
   Serial.println("Art-Net initialized and ready to receive data.");
 }
 
-void readArtNet() { artnet.read(); }
+void readArtNet()
+{
+  artnet.read();
+}
+

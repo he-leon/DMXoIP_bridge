@@ -143,7 +143,7 @@ void setupWiFiManager()
         Serial.println("Entered config mode");
         Serial.println(WiFi.softAPIP());
         Serial.println(myWiFiManager->getConfigPortalSSID());
-        setLEDColor(CRGB::Blue);  // Indicate AP mode
+        setLEDColor(RgbColor(0, 0, 255));  // Blue
       });
 
   wm.setSaveParamsCallback(saveConfigCallback);

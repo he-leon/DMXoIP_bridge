@@ -1,9 +1,10 @@
 #ifndef ARTNETHANDLER_H
 #define ARTNETHANDLER_H
 
-#include <FastLED.h>
+#include <NeoPixelBus.h>
 
 void setupArtNet();
 void readArtNet();
 
 #endif  // ARTNETHANDLER_H
+
