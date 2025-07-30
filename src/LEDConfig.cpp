@@ -21,7 +21,6 @@ void setupLEDs()
 void setLEDColor(CRGB color)
 {
   fill_solid(leds, numLeds, color);
-  FastLED.show();
 }
 
 void setBrightness(uint8_t brightness)

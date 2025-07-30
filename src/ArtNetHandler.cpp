@@ -12,27 +12,36 @@ void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *d
 {
   if (universe == ::universe)
   {
-    if (startAddress-1 < 0)
+    if (startAddress - 1 < 0)
     {
       return;
-    } 
-    uint8_t brightness = data[startAddress-1];
+    }
+    uint8_t brightness = data[startAddress - 1];
     CRGB color         = CRGB::Black;
 
     if (startAddress + 2 < length)
     {
       color = CRGB(data[startAddress], data[startAddress + 1], data[startAddress + 2]);
     }
+    bool needsUpdate = false;
+
     if (currentBrightness != brightness)
     {
       currentBrightness = brightness;
-      setBrightness(brightness);
-      calculatePowerUsage();
+      FastLED.setBrightness(brightness);  // Don't call show() here
+      needsUpdate = true;
     }
+
     if (currentColor != color)
     {
       currentColor = color;
-      setLEDColor(color);
+      setLEDColor(color);  // Don't call show() here
+      needsUpdate = true;
+    }
+
+    if (needsUpdate)
+    {
+      FastLED.show();
       calculatePowerUsage();
     }
   }
