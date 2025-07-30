@@ -17,26 +17,37 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
 
   uint8_t brightness = data[startAddress - 1];
   RgbColor color(
-    data[startAddress],         // Red
-    data[startAddress + 1],     // Green
-    data[startAddress + 2]);    // Blue
+    data[startAddress],
+    data[startAddress + 1],
+    data[startAddress + 2]);
 
   bool needsUpdate = false;
-
+  
   if (brightness != currentBrightness) {
     currentBrightness = brightness;
-    setBrightness(brightness);
     needsUpdate = true;
   }
 
   if (color != currentColor) {
     currentColor = color;
-    setLEDColor(color);
     needsUpdate = true;
   }
 
   if (needsUpdate) {
-    calculatePowerUsage();
+    RgbColor scaledColor = currentColor;
+    scaledColor.Dim(currentBrightness);
+    
+    for (int i = 0; i < numLeds; i++) {
+      strip->SetPixelColor(i, scaledColor);
+    }
+    strip->Show();
+    
+    // Only calculate power occasionally, not on every frame
+    static unsigned long lastPowerCalc = 0;
+    if (millis() - lastPowerCalc > 1000) { // Every second
+      calculatePowerUsage();
+      lastPowerCalc = millis();
+    }
   }
 }
 
