@@ -14,5 +14,6 @@ void blinkGreenTwice();
 void calculatePowerUsage();
 
 extern float totalPower;
+extern NeoPixelBus<NeoGrbFeature, NeoEsp32Rmt0800KbpsMethod>* strip;
 
 #endif  // LEDCONFIG_H

@@ -3,19 +3,19 @@
 
 #define LED_PIN 5  // Replace or keep depending on your setup
 
-// Use RMT with 800kHz timing (standard for WS2812)
-NeoPixelBus<NeoGrbFeature, NeoEsp32Rmt0800KbpsMethod> strip(numLeds, LED_PIN);
-
-
 float totalPower = 0.0;
 
 // Store current brightness separately, since NeoPixelBus handles brightness differently
 static uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
 
+NeoPixelBus<NeoGrbFeature, NeoEsp32Rmt0800KbpsMethod>* strip = nullptr;
+
 void setupLEDs()
 {
-  strip.Begin();
-  strip.Show();  // Initialize all LEDs off
+  if (strip) delete strip;  // Clean up if recreating
+  strip = new NeoPixelBus<NeoGrbFeature, NeoEsp32Rmt0800KbpsMethod>(numLeds, LED_PIN);
+  strip->Begin();
+  strip->Show();
 }
 
 void setLEDColor(RgbColor color)
@@ -25,10 +25,10 @@ void setLEDColor(RgbColor color)
 
   for (int i = 0; i < numLeds; i++)
   {
-    strip.SetPixelColor(i, scaledColor);
+    strip->SetPixelColor(i, scaledColor);
   }
 
-  strip.Show();
+  strip->Show();
 }
 
 void setBrightness(uint8_t brightness)
@@ -57,7 +57,7 @@ void calculatePowerUsage()
 
   for (int i = 0; i < numLeds; i++)
   {
-    RgbColor color = strip.GetPixelColor(i);
+    RgbColor color = strip->GetPixelColor(i);
     float redPower   = color.R / 255.0 * RED_POWER;
     float greenPower = color.G / 255.0 * GREEN_POWER;
     float bluePower  = color.B / 255.0 * BLUE_POWER;
