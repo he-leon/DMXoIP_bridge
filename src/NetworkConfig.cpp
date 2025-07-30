@@ -68,6 +68,9 @@ void setupWiFiManager()
   wm.addParameter(&custom_startAddress);
   wm.addParameter(&custom_deviceName);
 
+  // Disable WiFi power saving mode to reduce UTP latency/jitter
+  WiFi.setSleep(false);
+
   WiFi.hostname(deviceName.c_str());
 
   setupMenu();
