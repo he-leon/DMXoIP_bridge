@@ -3,6 +3,7 @@
 #include "ArtNetHandler.h"
 #include "ConfigParameters.h"
 #include "LEDConfig.h"
+#include "Sensors.h"
 #include "NetworkConfig.h"
 #include "SPIFFS.h"
 
@@ -17,6 +18,7 @@ void setup()
   }
 
   initializePreferences();
+  setupSensors();
   setupLEDs();
   setupWiFiManager();
   setupArtNet();
@@ -30,4 +32,5 @@ void loop()
   handleWiFiManager();
   readArtNet();
   handleOTA();
+  handleSensors(); 
 }

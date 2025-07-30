@@ -8,6 +8,7 @@ DEVICE_NAME="ArtNet_LED_Strip"
 WIFI_SSID="SomeSSID"
 WIFI_PASSWORD="mypassword123"
 WIFI_PRIORITY=0
+UPLOAD_PORT="/dev/ttyUSB0"
 
 # Function to print usage
 print_usage() {
@@ -17,6 +18,7 @@ print_usage() {
     echo "  -u, --universe NUM       DMX universe (default: 0)"
     echo "  -a, --address NUM        Start address (default: 1)"
     echo "  -d, --device-name NAME   Device name (default: ArtNet_LED_Strip)"
+    echo "  -u, --upload-port PORT   Upload port (default: /dev/ttyUSB0)"
     echo "  -s, --ssid SSID          WiFi SSID (default: SomeSSID)" 
     echo "  -p, --password PASS     WiFi password (default: mypassword123)"
     echo "  -r, --priority NUM      WiFi priority (default: 0)"
@@ -53,6 +55,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -d|--device-name)
             DEVICE_NAME="$2"
+            shift 2
+            ;;
+        -u|--upload-port)
+            UPLOAD_PORT="$2"
             shift 2
             ;;
         -s|--ssid)
@@ -120,7 +126,7 @@ fi
 # Upload to SPIFFS
 echo "Uploading files to SPIFFS..."
 if command -v pio &> /dev/null; then
-    pio run --target uploadfs
+    pio run --target uploadfs --upload-port "$UPLOAD_PORT" 
     if [ $? -eq 0 ]; then
         echo "Successfully uploaded files to SPIFFS"
     else

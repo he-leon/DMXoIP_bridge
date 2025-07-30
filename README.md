@@ -105,3 +105,10 @@ Monitor real-time power usage through the web interface at `http://[device-name]
 ```bash
 pio run --target upload --upload-port [device-name].local 
 ```
+
+
+## Temperature Measurements of 36 LEDs in case
+- RGB (255,0,0); 4.2 W calculated, 57°C measured after 10 minutes, Room temperature 20°C
+- RGB (0,255,0); 3.0 W calculated, 52°C measured after 10 minutes
+- BGB (0,0,255); 3.9 W calculated, 54°C measured after 10 minutes
+- RGB (255,0,255); 8.1 W calculated, 71°C measured after 10 minutes

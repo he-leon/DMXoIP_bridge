@@ -2,9 +2,11 @@
 #include <ArduinoOTA.h>
 #include <ESPmDNS.h>
 #include <WiFiManager.h>
+#include <ArduinoJson.h>
 
 #include "ConfigParameters.h"
 #include "LEDConfig.h"
+#include "Sensors.h"
 
 WiFiManager wm;
 
@@ -19,9 +21,14 @@ void saveConfigCallback()
 
 void handleMonitor()
 {
-  String totalPowerString;
-  totalPowerString = String(totalPower);
-  wm.server->send(200, "text/plain", totalPowerString.c_str());
+  // Create json object from totalPower and currentTemperature
+  StaticJsonDocument<200> doc;
+  doc["totalPower"] = totalPower;
+  doc["currentTemperature"] = currentTemperature;
+  doc["currentInternalTemperature"] = currentInternalTemperature;
+
+  //wm.server->send(200, "text/plain", totalPowerString.c_str());
+  wm.server->send(200, "application/json", doc.as<String>());
 }
 
 void bindServerCallback() { wm.server->on("/monitor", handleMonitor); }
