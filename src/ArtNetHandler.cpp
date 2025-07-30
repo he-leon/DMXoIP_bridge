@@ -19,7 +19,7 @@ void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t *d
     uint8_t brightness = data[startAddress - 1];
     CRGB color         = CRGB::Black;
 
-    if (startAddress + 2 < length)
+    if ((startAddress - 1 + 2) < length)
     {
       color = CRGB(data[startAddress], data[startAddress + 1], data[startAddress + 2]);
     }
