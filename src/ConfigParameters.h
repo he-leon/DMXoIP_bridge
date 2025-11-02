@@ -14,12 +14,17 @@ extern int numLeds;
 extern int universe;
 extern int startAddress;
 extern String deviceName;
+enum ProtocolType { PROTO_ARTNET = 0, PROTO_E131 = 1 };
+extern ProtocolType protocol;
+
+
 
 // WiFiManager custom parameters
 extern WiFiManagerParameter custom_numLeds;
 extern WiFiManagerParameter custom_universe;
 extern WiFiManagerParameter custom_startAddress;
 extern WiFiManagerParameter custom_deviceName;
+extern WiFiManagerParameter custom_protocol;
 
 void initializePreferences();  // Add this line
 void loadPreferences();

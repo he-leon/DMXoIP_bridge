@@ -1,4 +1,3 @@
-
 #include "ConfigParameters.h"
 
 #include <ArduinoJson.h>
@@ -10,6 +9,8 @@ int startAddress           = 2;
 String chipID              = String((uint32_t) ESP.getEfuseMac(), HEX);
 String defaultDeviceName   = "ESP32-" + chipID;
 String deviceName          = defaultDeviceName;
+ProtocolType protocol =  PROTO_E131;
+
 const char *configFilePath = "/config.json";
 
 std::vector<WiFiConfig> wifiConfigs;  // Holds multiple Wi-Fi configurations
@@ -31,6 +32,12 @@ WiFiManagerParameter custom_deviceName("deviceName",
                                        "Device Name",
                                        defaultDeviceName.c_str(),
                                        32);
+WiFiManagerParameter custom_protocol("protocol",
+                                     "Protocol",
+                                     String(protocol).c_str(),
+                                     1);
+
+                                    
 
 void loadWiFiConfigs()
 {
@@ -168,6 +175,7 @@ void loadPreferences()
     universe     = json["universe"] | 0;
     startAddress = json["startAddress"] | 2;
     deviceName   = json["deviceName"] | defaultDeviceName;
+    protocol     = static_cast<ProtocolType>(json["protocol"] | PROTO_E131);
   }
 
   configFile.close();
@@ -176,6 +184,7 @@ void loadPreferences()
   Serial.println("universe: " + String(universe));
   Serial.println("startAddress: " + String(startAddress));
   Serial.println("deviceName: " + deviceName);
+  Serial.println("protocol: " + String(protocol));
 }
 
 void savePreferences()
@@ -185,6 +194,7 @@ void savePreferences()
   Serial.println("universe: " + String(universe));
   Serial.println("startAddress: " + String(startAddress));
   Serial.println("deviceName: " + deviceName);
+  Serial.println("protocol: " + String(protocol));
   Serial.println("Saving preferences to SPIFFS...");
   File configFile = SPIFFS.open(configFilePath, FILE_WRITE);
   if (!configFile)
@@ -195,12 +205,14 @@ void savePreferences()
 
   // Write settings as JSON format
   configFile.printf(
-      "{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, "
-      "\"deviceName\": \"%s\"}\n",
+      "{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, \"deviceName\": \"%s\", \"protocol\": %d}\n",
       numLeds,
       universe,
       startAddress,
-      deviceName.c_str());
+      deviceName.c_str(),
+      protocol
+      );
+        
   configFile.close();
 
   Serial.println("Preferences saved.");

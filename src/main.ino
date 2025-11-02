@@ -30,7 +30,17 @@ void setup()
 void loop()
 {
   handleWiFiManager();
-  readArtNet();
+  switch (protocol) {
+    case PROTO_ARTNET:
+      readArtNet();
+      break;
+    case PROTO_E131:
+      readE131();
+      break;
+    default:
+      // Handle unknown protocol
+      break;
+  }
   handleOTA();
   handleSensors(); 
 }

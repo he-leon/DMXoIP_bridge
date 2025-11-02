@@ -6,8 +6,10 @@
 ArtnetWifi artnet;
 ESPAsyncE131 e131;
 
+#ifdef SINGLE_COLOR
 RgbColor currentColor(0);
 uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
+#endif
 
 #ifdef SINGLE_COLOR
 void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data)
@@ -53,7 +55,9 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
     }
   }
 }
+
 #else
+
 void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data)
 {
   if (universeIn != ::universe)
@@ -106,6 +110,13 @@ void setupE131()
     }
 }
 
+void handleE131Packet(e131_packet_t* packet) {
+    uint16_t universe = htons(packet->universe);
+    uint16_t length = htons(packet->property_value_count) - 1;
+    uint8_t* data = packet->property_values + 1;  // skip start code
+    onDmxFrame(universe, length, packet->sequence_number, data);
+}
+
 void readE131()
 {
     if (!e131.isEmpty()) {
@@ -115,12 +126,5 @@ void readE131()
                     handleE131Packet(&packet);
                 }
     }
-}
-
-void handleE131Packet(e131_packet_t* packet) {
-    uint16_t universe = htons(packet->universe);
-    uint16_t length = htons(packet->property_value_count) - 1;
-    uint8_t* data = packet->property_values + 1;  // skip start code
-    onDmxPacket(universe, length, packet->sequence_number, data);
 }
 
