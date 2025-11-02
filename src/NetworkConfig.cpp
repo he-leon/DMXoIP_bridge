@@ -16,6 +16,7 @@ void saveConfigCallback()
   universe     = atoi(custom_universe.getValue());
   startAddress = atoi(custom_startAddress.getValue());
   deviceName   = custom_deviceName.getValue();
+  protocol     = static_cast<ProtocolType>(atoi(custom_protocol.getValue()));
   savePreferences();
 }
 
@@ -62,16 +63,45 @@ void setupWiFiManager()
   custom_universe.setValue(String(universe).c_str(), 5);
   custom_startAddress.setValue(String(startAddress).c_str(), 5);
   custom_deviceName.setValue(deviceName.c_str(), 32);
+  custom_protocol.setValue(String(protocol).c_str(), 1);
 
+  
   wm.addParameter(&custom_numLeds);
   wm.addParameter(&custom_universe);
   wm.addParameter(&custom_startAddress);
   wm.addParameter(&custom_deviceName);
+  wm.addParameter(&custom_protocol);
+  wm.addParameter(&custom_protocol_select);
 
   // Disable WiFi power saving mode to reduce UTP latency/jitter
   WiFi.setSleep(false);
 
   WiFi.hostname(deviceName.c_str());
+
+  const char* headhtml = R"rawliteral(
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    var input = document.getElementById("protocol");
+    var select = document.getElementById("protocol_dummy");
+    if (!input || !select) return;
+
+    // Initialize dropdown from hidden input
+    select.value = input.value || "0";
+
+    // Keep hidden input updated when dropdown changes
+    select.addEventListener("change", function() {
+      input.value = select.value;
+    });
+  });
+  </script>
+  <style>
+   #protocol, label[for='protocol'] {
+      display: none;
+    }
+  </style>
+  )rawliteral";
+
+  wm.setCustomHeadElement(headhtml);
 
   setupMenu();
 

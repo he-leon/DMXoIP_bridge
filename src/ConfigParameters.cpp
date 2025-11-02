@@ -36,6 +36,17 @@ WiFiManagerParameter custom_protocol("protocol",
                                      "Protocol",
                                      String(protocol).c_str(),
                                      1);
+const char *bufferStr = R"(
+  <!-- INPUT SELECT -->
+  <label for='protocol_dummy'>Protocol</label>
+  <select name="protocol_dummy" id="protocol_dummy" class="button">
+  <option value="0">ArtNet</option>
+  <option value="1">E1.31</option>
+  </select>
+  )";
+
+WiFiManagerParameter custom_protocol_select(bufferStr);
+
 
                                     
 

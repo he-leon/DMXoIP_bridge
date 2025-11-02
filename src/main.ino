@@ -21,7 +21,17 @@ void setup()
   setupSensors();
   setupLEDs();
   setupWiFiManager();
-  setupArtNet();
+  switch (protocol) {
+    case PROTO_ARTNET:
+      setupArtNet();
+      break;
+    case PROTO_E131:
+      setupE131();
+      break;
+    default:
+      Serial.println("Unknown protocol selected.");
+      break;
+  }
   setupOTA();
 
   Serial.println("Setup complete.");

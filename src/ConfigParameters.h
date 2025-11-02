@@ -25,6 +25,7 @@ extern WiFiManagerParameter custom_universe;
 extern WiFiManagerParameter custom_startAddress;
 extern WiFiManagerParameter custom_deviceName;
 extern WiFiManagerParameter custom_protocol;
+extern WiFiManagerParameter custom_protocol_select;
 
 void initializePreferences();  // Add this line
 void loadPreferences();

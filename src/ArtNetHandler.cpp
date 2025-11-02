@@ -111,6 +111,7 @@ void setupE131()
 }
 
 void handleE131Packet(e131_packet_t* packet) {
+    Serial.println("E1.31 packet received");
     uint16_t universe = htons(packet->universe);
     uint16_t length = htons(packet->property_value_count) - 1;
     uint8_t* data = packet->property_values + 1;  // skip start code
