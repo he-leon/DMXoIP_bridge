@@ -5,6 +5,9 @@
 
 void setupArtNet();
 void readArtNet();
+void setupE131();
+void readE131();
+void handleE131Packet();
 
 #endif  // ARTNETHANDLER_H
 
