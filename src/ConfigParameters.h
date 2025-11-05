@@ -30,6 +30,7 @@ extern WiFiManagerParameter custom_startAddress;
 extern WiFiManagerParameter custom_deviceName;
 extern WiFiManagerParameter custom_protocol;
 extern WiFiManagerParameter custom_protocol_select;
+extern WiFiManagerParameter custom_colorMode;
 extern WiFiManagerParameter custom_colorMode_select;
 
 void initializePreferences();

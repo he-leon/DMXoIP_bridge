@@ -18,10 +18,11 @@ std::vector<WiFiConfig> wifiConfigs;
 
 // Wi-FiManager Parameters
 WiFiManagerParameter custom_numLeds("numLeds", "Number of LEDs", String(numLeds).c_str(), 5);
-WiFiManagerParameter custom_universe("universe", "Art-Net Universe", String(universe).c_str(), 5);
+WiFiManagerParameter custom_universe("universe", "Universe", String(universe).c_str(), 5);
 WiFiManagerParameter custom_startAddress("startAddress", "Start Address", String(startAddress).c_str(), 5);
 WiFiManagerParameter custom_deviceName("deviceName", "Device Name", defaultDeviceName.c_str(), 32);
 WiFiManagerParameter custom_protocol("protocol", "Protocol", String(protocol).c_str(), 1);
+WiFiManagerParameter custom_colorMode("colorMode", "LED Addressing", String(colorMode).c_str(), 1); 
 
 const char *protocolDropdownStr = R"(
   <label for='protocol_dummy'>Protocol</label>
@@ -33,8 +34,8 @@ const char *protocolDropdownStr = R"(
 WiFiManagerParameter custom_protocol_select(protocolDropdownStr);
 
 const char *colorModeDropdownStr = R"(
-  <label for='colorMode'>LED Addressing</label>
-  <select name='colorMode' id='colorMode' class='button'>
+  <label for='colorMode_dummy'>LED Addressing</label>
+  <select name='colorMode_dummy' id='colorMode_dummy' class='button'>
     <option value='0'>Individual</option>
     <option value='1'>Single combined</option>
   </select>
@@ -115,11 +116,20 @@ void loadPreferences() {
         colorMode = static_cast<ColorModeType>(json["colorMode"] | COLOR_MODE_MULTIPLE);
     }
     configFile.close();
+    Serial.printf(
+        "Loaded preferences - numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, protocol: %d, colorMode: %d\n",
+        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode
+    );
 }
 
 void savePreferences() {
     File configFile = SPIFFS.open(configFilePath, FILE_WRITE);
     if (!configFile) { Serial.println("Failed to open config file for writing"); return; }
+    Serial.println("Saving preferences to SPIFFS...");
+    Serial.printf(
+        "numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, protocol: %d, colorMode: %d\n",
+        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode
+    );
 
     configFile.printf(
         "{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, \"deviceName\": \"%s\", \"protocol\": %d, \"colorMode\": %d}\n",

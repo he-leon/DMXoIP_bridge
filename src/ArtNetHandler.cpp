@@ -16,6 +16,7 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
     static unsigned long lastPowerCalc = 0;
 
     if (colorMode == COLOR_MODE_SINGLE) {
+        //Serial.println("Color Mode: SINGLE");
         uint8_t brightness = data[startAddress - 1];
         RgbColor color(data[startAddress], data[startAddress + 1], data[startAddress + 2]);
         bool needsUpdate = false;
@@ -23,19 +24,24 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
         if (brightness != currentBrightness) { currentBrightness = brightness; needsUpdate = true; }
         if (color != currentColor) { currentColor = color; needsUpdate = true; }
 
+        //Serial.printf("Received color R:%d G:%d B:%d at brightness %d\n", color.R, color.G, color.B, brightness);
+
         if (needsUpdate) {
             RgbColor scaledColor = currentColor;
             scaledColor.Dim(currentBrightness);
+            //Serial.printf("Updating all LEDs to R:%d G:%d B:%d at brightness %d\n", scaledColor.R, scaledColor.G, scaledColor.B, currentBrightness);
             for (int i = 0; i < numLeds; i++) strip->SetPixelColor(i, scaledColor);
             strip->Show();
         }
 
     } else { // COLOR_MODE_MULTIPLE
         for (int i = 0; i < numLeds; i++) {
-            uint8_t brightness = data[i + startAddress - 1];
-            RgbColor color(data[i + startAddress], data[i + startAddress + 1], data[i + startAddress + 2]);
+            int j = i * 4;
+            uint8_t brightness = data[j + startAddress - 1];
+            RgbColor color(data[j + startAddress], data[j + startAddress + 1], data[j + startAddress + 2]);
             RgbColor scaledColor = color;
             scaledColor.Dim(brightness);
+            //Serial.printf("LED %d - R:%d G:%d B:%d at brightness %d\n", i, color.R, color.G, color.B, brightness);
             strip->SetPixelColor(i, scaledColor);
         }
         strip->Show();
@@ -59,7 +65,6 @@ void setupE131() {
 }
 
 void handleE131Packet(e131_packet_t* packet) {
-    Serial.println("E1.31 packet received");
     uint16_t universe = htons(packet->universe);
     uint16_t length = htons(packet->property_value_count) - 1;
     uint8_t* data = packet->property_values + 1;

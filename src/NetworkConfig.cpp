@@ -6,34 +6,25 @@
 #include "ConfigParameters.h"
 #include "LEDConfig.h"
 #include "Sensors.h"
+#define WM_DEBUG_LEVEL DEBUG_VERBOSE
 
 WiFiManager wm;
 
 void saveConfigCallback()
 {
+  Serial.println("Saving configuration from Wi-FiManager parameters...");
   numLeds      = atoi(custom_numLeds.getValue());
   universe     = atoi(custom_universe.getValue());
   startAddress = atoi(custom_startAddress.getValue());
   deviceName   = custom_deviceName.getValue();
   protocol     = static_cast<ProtocolType>(atoi(custom_protocol.getValue()));
-  colorMode    = static_cast<ColorModeType>(atoi(custom_colorMode_select.getValue())); // ✅ Save color mode
+  colorMode    = static_cast<ColorModeType>(atoi(custom_colorMode.getValue())); // ✅ Save color mode
   savePreferences();
 }
 
-void handleMonitor()
-{
-  StaticJsonDocument<200> doc;
-  doc["totalPower"]               = totalPower;
-  doc["currentTemperature"]       = currentTemperature;
-  doc["currentInternalTemperature"] = currentInternalTemperature;
-  wm.server->send(200, "application/json", doc.as<String>());
-}
-
-void bindServerCallback() { wm.server->on("/monitor", handleMonitor); }
 
 void setupMenu()
 {
-  wm.setWebServerCallback(bindServerCallback);
 
   std::vector<const char *> menu = {"wifi",
                                     "info",
@@ -54,22 +45,32 @@ void setupMenu()
 
 void setupWiFiManager()
 {
+  wm.setSaveParamsCallback(saveConfigCallback);
+  wm.setSaveConfigCallback([]() {
+    Serial.println("WiFiManager portal saved new Wi-Fi credentials.");
+    WiFiConfig newConfig{WiFi.SSID(), WiFi.psk(), 0};
+    addWiFiConfig(newConfig.ssid, newConfig.password, newConfig.priority);
+    ESP.restart();
+  });
+
   // Load existing config values into Wi-FiManager parameters
   custom_numLeds.setValue(String(numLeds).c_str(), 5);
   custom_universe.setValue(String(universe).c_str(), 5);
   custom_startAddress.setValue(String(startAddress).c_str(), 5);
   custom_deviceName.setValue(deviceName.c_str(), 32);
   custom_protocol.setValue(String(protocol).c_str(), 1);
-  custom_colorMode_select.setValue(String(static_cast<int>(colorMode)).c_str(), 1); // ✅ Preload color mode
+  custom_colorMode.setValue(String(colorMode).c_str(), 1); // ✅ Preload color mode
 
   // Add all parameters to Wi-FiManager
   wm.addParameter(&custom_numLeds);
+  wm.addParameter(&custom_colorMode); 
+  wm.addParameter(&custom_protocol);
+  wm.addParameter(&custom_protocol_select);
+  wm.addParameter(&custom_colorMode_select); 
   wm.addParameter(&custom_universe);
   wm.addParameter(&custom_startAddress);
   wm.addParameter(&custom_deviceName);
-  wm.addParameter(&custom_protocol);
-  wm.addParameter(&custom_protocol_select);
-  wm.addParameter(&custom_colorMode_select); // ✅ Add dropdown to portal
+
 
   WiFi.setSleep(false);
   WiFi.hostname(deviceName.c_str());
@@ -90,7 +91,7 @@ void setupWiFiManager()
 
     // Color mode dropdown sync
     var colorInput = document.getElementById("colorMode");
-    var colorSelect = document.getElementById("colorMode");
+    var colorSelect = document.getElementById("colorMode_dummy");
     if (colorInput && colorSelect) {
       colorSelect.value = colorInput.value || "0";
       colorSelect.addEventListener("change", function() {
@@ -101,6 +102,7 @@ void setupWiFiManager()
   </script>
   <style>
     #protocol, label[for='protocol'] { display: none; }
+    #colorMode, label[for='colorMode'] { display: none; }
   </style>
   )rawliteral";
 
@@ -168,15 +170,7 @@ void setupWiFiManager()
     Serial.println(myWiFiManager->getConfigPortalSSID());
     setLEDColor(RgbColor(0, 0, 255));  // Blue
   });
-
-  wm.setSaveParamsCallback(saveConfigCallback);
-  wm.setSaveConfigCallback([]() {
-    Serial.println("WiFiManager portal saved new Wi-Fi credentials.");
-    WiFiConfig newConfig{WiFi.SSID(), WiFi.psk(), 0};
-    addWiFiConfig(newConfig.ssid, newConfig.password, newConfig.priority);
-    ESP.restart();
-  });
-
+ 
   wm.startConfigPortal(deviceName.c_str());
 }
 

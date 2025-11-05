@@ -1,7 +1,7 @@
 #include "LEDConfig.h"
 #include "ConfigParameters.h"
 
-#define LED_PIN 5  // Replace or keep depending on your setup
+#define LED_PIN 16  // Replace or keep depending on your setup
 
 float totalPower = 0.0;
 
