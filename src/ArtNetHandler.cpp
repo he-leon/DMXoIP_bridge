@@ -17,29 +17,45 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
 
     if (colorMode == COLOR_MODE_SINGLE) {
         //Serial.println("Color Mode: SINGLE");
-        uint8_t brightness = data[startAddress - 1];
-        RgbColor color(data[startAddress], data[startAddress + 1], data[startAddress + 2]);
+        RgbColor color;
         bool needsUpdate = false;
+        if (USE_DIM_CHANNEL) {
+            uint8_t brightness = data[startAddress - 1];
+            color = RgbColor(data[startAddress], data[startAddress + 1], data[startAddress + 2]);
 
-        if (brightness != currentBrightness) { currentBrightness = brightness; needsUpdate = true; }
-        if (color != currentColor) { currentColor = color; needsUpdate = true; }
+            if (brightness != currentBrightness) { currentBrightness = brightness; needsUpdate = true; }
+            if (color != currentColor) { currentColor = color; needsUpdate = true; }
+        } else {
+            color = RgbColor(data[startAddress - 1], data[startAddress], data[startAddress + 1]);
+            if (color != currentColor) { currentColor = color; needsUpdate = true; }
+        }
 
         //Serial.printf("Received color R:%d G:%d B:%d at brightness %d\n", color.R, color.G, color.B, brightness);
 
         if (needsUpdate) {
             RgbColor scaledColor = color.Dim(currentBrightness);
-            Serial.printf("Updating all LEDs to R:%d G:%d B:%d at brightness %d\n", scaledColor.R, scaledColor.G, scaledColor.B, currentBrightness);
+            //Serial.printf("Updating all LEDs to R:%d G:%d B:%d at brightness %d\n", scaledColor.R, scaledColor.G, scaledColor.B, currentBrightness);
             for (int i = 0; i < numLeds; i++) strip->SetPixelColor(i, scaledColor);
             strip->Show();
         }
 
     } else { // COLOR_MODE_MULTIPLE
         for (int i = 0; i < numLeds; i++) {
-            int j = i * 4;
-            uint8_t brightness = data[j + startAddress - 1];
-            RgbColor color(data[j + startAddress], data[j + startAddress + 1], data[j + startAddress + 2]);
-            RgbColor scaledColor = color.Dim(brightness);
-            Serial.printf("LED %d - R:%d G:%d B:%d at brightness %d\n", i, scaledColor.R, scaledColor.G, scaledColor.B, brightness);
+            RgbColor scaledColor;
+            if (USE_DIM_CHANNEL)
+            {
+                int j = i * 4;
+                uint8_t brightness = data[j + startAddress - 1];
+                RgbColor color(data[j + startAddress], data[j + startAddress + 1], data[j + startAddress + 2]);
+                scaledColor = color.Dim(brightness);
+            }
+            else
+            {
+                int j = i * 3;
+                RgbColor color(data[j + startAddress - 1], data[j + startAddress], data[j + startAddress + 1]);
+                scaledColor = color.Dim(currentBrightness);
+            }
+            //Serial.printf("LED %d - R:%d G:%d B:%d at brightness %d\n", i, scaledColor.R, scaledColor.G, scaledColor.B, brightness);
             strip->SetPixelColor(i, scaledColor);
         }
         strip->Show();

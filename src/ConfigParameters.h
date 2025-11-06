@@ -7,6 +7,7 @@
 
 #define LED_PIN 5
 #define DEFAULT_BRIGHTNESS 50
+#define USE_DIM_CHANNEL false
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
 
