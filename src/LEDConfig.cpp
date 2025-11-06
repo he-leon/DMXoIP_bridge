@@ -8,12 +8,12 @@ float totalPower = 0.0;
 // Store current brightness separately, since NeoPixelBus handles brightness differently
 static uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
 
-NeoPixelBus<NeoGrbFeature, NeoEsp32Rmt0800KbpsMethod>* strip = nullptr;
+NeoPixelBus<NeoGrbFeature, NeoEsp32I2s0Ws2812xMethod>* strip = nullptr;
 
 void setupLEDs()
 {
   if (strip) delete strip;  // Clean up if recreating
-  strip = new NeoPixelBus<NeoGrbFeature, NeoEsp32Rmt0800KbpsMethod>(numLeds, LED_PIN);
+  strip = new NeoPixelBus<NeoGrbFeature, NeoEsp32I2s0Ws2812xMethod>(numLeds, LED_PIN);
   strip->Begin();
   strip->Show();
 }
