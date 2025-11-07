@@ -56,5 +56,5 @@ void loop()
     handleWiFiManager();
     handleOTA();
   }
-  statusLED.update(isReceiving());
+  statusLED.update();
 }

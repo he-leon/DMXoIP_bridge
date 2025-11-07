@@ -9,7 +9,7 @@ SERIAL_PORT   = '/dev/ttyACM0'  # ESP32 serial port on Linux
 BAUDRATE      = 115200
 UNIVERSE      = 1
 NUM_CHANNELS  = 512         # E1.31 universe size
-PACKET_INTERVAL_HZ = 40        # in Hz
+PACKET_INTERVAL_HZ = 50        # in Hz
 # -----------------------------------------------
 
 # Open serial port
@@ -26,7 +26,7 @@ sender.start()
 # ---------------- Serial reader ----------------
 latencies = []
 send_times = {}
-pattern = re.compile(r"SEQ:(\d+)")
+pattern = re.compile(r"CH1:(\d+)")
 
 # FPS + latency tracking
 received_count = 0
@@ -53,7 +53,7 @@ def serial_reader():
 
         # Once per second, print stats
         now = time.time()
-        if now - last_fps_time >= 1.0:
+        if now - last_fps_time >= 0.1:
             with fps_lock:
                 elapsed = now - last_fps_time
                 fps = received_count / elapsed if elapsed > 0 else 0

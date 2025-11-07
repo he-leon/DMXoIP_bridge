@@ -3,7 +3,6 @@
 #include "ArtNetHandler.h"
 #include "LEDConfig.h"
 
-
 ArtnetWifi artnet;
 ESPAsyncE131 e131;
 
@@ -11,16 +10,39 @@ RgbColor currentColor(0);
 uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
 unsigned long lastPacketTime = 0;
 
+static uint16_t frameCount = 0;
+static uint32_t lastFpsMicros = 0;
+static uint16_t currentFps = 0;  // Integer FPS
+
+void updateFrameRate() {
+    frameCount++;
+    uint32_t now = micros();
+    uint32_t elapsed = now - lastFpsMicros;
+    
+    if (elapsed >= 100000) {
+        currentFps = (frameCount * 1000000UL) / elapsed;  // Pure integer math
+        frameCount = 0;
+        lastFpsMicros = now;
+        Serial.printf("FPS: %u\n", currentFps);
+    }
+}
+
+
+uint16_t getFrameRate() {
+    return currentFps;
+}
+
+// ----------------- DMX Frame Handler -----------------
 void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data) {
+    updateFrameRate();  // <--- Update FPS counter
     if (universeIn != ::universe) return;
     lastPacketTime = millis();
-    Serial.printf("SEQ:%d\n", data[0]);
+    Serial.printf("CH1:%d, FPS:%d\n", data[0], getFrameRate());
     if (startAddress - 1 < 0 || (startAddress - 1 + 2) >= length) return;
 
     static unsigned long lastPowerCalc = 0;
 
     if (colorMode == COLOR_MODE_SINGLE) {
-        //Serial.println("Color Mode: SINGLE");
         RgbColor color;
         bool needsUpdate = false;
         if (USE_DIM_CHANNEL) {
@@ -34,11 +56,8 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
             if (color != currentColor) { currentColor = color; needsUpdate = true; }
         }
 
-        //Serial.printf("Received color R:%d G:%d B:%d at brightness %d\n", color.R, color.G, color.B, brightness);
-
         if (needsUpdate) {
             RgbColor scaledColor = color.Dim(currentBrightness);
-            //Serial.printf("Updating all LEDs to R:%d G:%d B:%d at brightness %d\n", scaledColor.R, scaledColor.G, scaledColor.B, currentBrightness);
             for (int i = 0; i < numLeds; i++) strip->SetPixelColor(i, scaledColor);
             strip->Show();
         }
@@ -59,7 +78,6 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
                 RgbColor color(data[j + startAddress - 1], data[j + startAddress], data[j + startAddress + 1]);
                 scaledColor = color.Dim(currentBrightness);
             }
-            //Serial.printf("LED %d - R:%d G:%d B:%d at brightness %d\n", i, scaledColor.R, scaledColor.G, scaledColor.B, brightness);
             strip->SetPixelColor(i, scaledColor);
         }
         strip->Show();
@@ -74,6 +92,7 @@ void setupArtNet() {
     artnet.setArtDmxCallback(onDmxFrame);
     Serial.println("Art-Net initialized and ready.");
 }
+
 void readArtNet() { artnet.read(); }
 
 // ----------------- E1.31 -----------------

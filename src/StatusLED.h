@@ -8,7 +8,7 @@ public:
   StatusLED(uint8_t pin = LED_BUILTIN, unsigned long blinkInterval = 500, bool activeLow = false);
 
   void begin();
-  void update(bool receiving);
+  void update();
 
 private:
   uint8_t _pin;

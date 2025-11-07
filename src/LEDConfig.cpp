@@ -67,8 +67,8 @@ void calculatePowerUsage()
   // Scale by brightness level (which was pre-applied)
   totalPower *= currentBrightness / 255.0;
 
-  Serial.print("Current power usage: ");
-  Serial.print(totalPower);
-  Serial.println(" W");
+  // Serial.print("Current power usage: ");
+  // Serial.print(totalPower);
+  // Serial.println(" W");
 }
 

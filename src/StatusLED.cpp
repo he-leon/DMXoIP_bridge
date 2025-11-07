@@ -1,4 +1,5 @@
 #include "StatusLED.h"
+#include "ArtNetHandler.h"
 
 StatusLED::StatusLED(uint8_t pin, unsigned long blinkInterval, bool activeLow)
   : _pin(pin), _interval(blinkInterval), _activeLow(activeLow),
@@ -9,10 +10,15 @@ void StatusLED::begin() {
   digitalWrite(_pin, _activeLow ? HIGH : LOW); // off by default
 }
 
-void StatusLED::update(bool receiving) {
-  if (receiving) {
-    // Solid ON while receiving
-    digitalWrite(_pin, _activeLow ? LOW : HIGH);
+void StatusLED::update() {
+  if (isReceiving()) {
+    // Solid ON while receiving and FPS > 25 Hz
+    if (getFrameRate() > 25)
+    {
+        digitalWrite(_pin, _activeLow ? LOW : HIGH);
+    }else {
+        digitalWrite(_pin, _activeLow ? HIGH : LOW);
+    }
     return;
   }
 
