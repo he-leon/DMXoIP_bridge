@@ -1,11 +1,13 @@
 #include <WiFiManager.h>
-
 #include "ArtNetHandler.h"
 #include "ConfigParameters.h"
 #include "LEDConfig.h"
 #include "Sensors.h"
 #include "NetworkConfig.h"
 #include "SPIFFS.h"
+#include "StatusLED.h"
+
+StatusLED statusLED; // uses LED_BUILTIN by default
 
 void setup()
 {
@@ -16,7 +18,7 @@ void setup()
     Serial.println("SPIFFS Mount Failed");
     return;
   }
-
+  statusLED.begin();
   initializePreferences();
   setupSensors();
   setupLEDs();
@@ -39,8 +41,6 @@ void setup()
 
 void loop()
 {
-  
-
   switch (protocol) {
     case PROTO_ARTNET:
       readArtNet();
@@ -52,8 +52,9 @@ void loop()
       // Handle unknown protocol
       break;
   }
-  if (millis() - lastPacketTime > PACKET_TIMEOUT_MS) {
+  if (!isReceiving()) {
     handleWiFiManager();
     handleOTA();
   }
+  statusLED.update(isReceiving());
 }
