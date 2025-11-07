@@ -6,6 +6,9 @@
 #define RED_POWER 0.110    // Power per LED at full brightness for Red
 #define GREEN_POWER 0.079  // Power per LED at full brightness for Green
 #define BLUE_POWER 0.103   // Power per LED at full brightness for Blue
+#ifndef NEOFEATURE
+#define NEOFEATURE NeoGrbFeature
+#endif
 
 void setupLEDs();
 void setLEDColor(RgbColor color);
@@ -13,7 +16,9 @@ void setBrightness(uint8_t brightness);
 void blinkGreenTwice();
 void calculatePowerUsage();
 
+typedef NEOFEATURE ActiveNeoFeature;
+
 extern float totalPower;
-extern NeoPixelBus<NeoGrbFeature, NeoEsp32I2s0Ws2812xMethod>* strip;
+extern NeoPixelBus<ActiveNeoFeature, NeoEsp32I2s0Ws2812xMethod>* strip;
 
 #endif  // LEDCONFIG_H

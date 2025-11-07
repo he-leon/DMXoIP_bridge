@@ -1,16 +1,20 @@
 #include <ArtnetWifi.h>
 #include "ConfigParameters.h"
+#include "ArtNetHandler.h"
 #include "LEDConfig.h"
-#include <ESPAsyncE131.h>
+
 
 ArtnetWifi artnet;
 ESPAsyncE131 e131;
 
 RgbColor currentColor(0);
 uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
+unsigned long lastPacketTime = 0;
 
 void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data) {
     if (universeIn != ::universe) return;
+    lastPacketTime = millis();
+    Serial.printf("SEQ:%d\n", data[0]);
     if (startAddress - 1 < 0 || (startAddress - 1 + 2) >= length) return;
 
     static unsigned long lastPowerCalc = 0;
@@ -90,5 +94,9 @@ void readE131() {
         e131_packet_t packet;
         while (!e131.isEmpty()) { e131.pull(&packet); handleE131Packet(&packet); }
     }
+}
+
+bool isReceiving() {
+    return (millis() - lastPacketTime) < PACKET_TIMEOUT_MS;
 }
 

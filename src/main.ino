@@ -39,7 +39,8 @@ void setup()
 
 void loop()
 {
-  handleWiFiManager();
+  
+
   switch (protocol) {
     case PROTO_ARTNET:
       readArtNet();
@@ -51,6 +52,8 @@ void loop()
       // Handle unknown protocol
       break;
   }
-  handleOTA();
-  handleSensors(); 
+  if (millis() - lastPacketTime > PACKET_TIMEOUT_MS) {
+    handleWiFiManager();
+    handleOTA();
+  }
 }

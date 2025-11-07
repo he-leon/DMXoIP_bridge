@@ -1,12 +1,17 @@
 #ifndef ARTNETHANDLER_H
 #define ARTNETHANDLER_H
+#include <ESPAsyncE131.h>
 
-#include <NeoPixelBus.h>
+#define PACKET_TIMEOUT_MS 5000
+
 
 void setupArtNet();
 void readArtNet();
 void setupE131();
 void readE131();
-void handleE131Packet(struct e131_packet_t* packet);
+void handleE131Packet(e131_packet_t* packet);
+bool isReceiving();
+
+extern unsigned long lastPacketTime;
 
 #endif  // ARTNETHANDLER_H
