@@ -1,23 +1,26 @@
 #include <WiFiManager.h>
 #include "DMXoIPHandler.h"
-#include "NeoPixelDMXFrameHandler.h" // <-- ADD
-#include "ConfigParameters.h"
+#include "NeoPixelDMXFrameHandler.h"
+#include "SerialDMXFrameHandler.h"
+#include "HardwareSerialDMXOutput.h"
+#include "ConfigParameters.h" // Assumed to define 'universe', 'protocol', PROTO_ARTNET, etc.
 #include "LEDConfig.h"
 #include "Sensors.h"
 #include "NetworkConfig.h"
 #include "SPIFFS.h"
 #include "StatusLED.h"
 
-
 ArtnetWifi artnet;
 ESPAsyncE131 e131;
 
-NeoPixelDMXFrameHandler dmxFrameHandler;
+NeoPixelDMXFrameHandler* neoPixelHandlerPtr = nullptr;
+HardwareSerialDMXOutput* dmxOutputPtr = nullptr; // Note: We use a pointer here too
+SerialDMXFrameHandler* serialDMXHandlerPtr = nullptr;
 
-DMXoIPHandler dmxoipHandler(dmxFrameHandler, artnet, e131);
+DMXoIPHandler* dmxoipHandlerPtr = nullptr;
 
-// Pass the DMXoIPHandler instance (which implements IDMXoIPStatus) to StatusLED
-StatusLED statusLED(dmxoipHandler);
+StatusLED* statusLEDPtr = nullptr;
+
 
 void setup()
 {
@@ -28,17 +31,36 @@ void setup()
         Serial.println("SPIFFS Mount Failed");
         return;
     }
-    statusLED.begin();
-    initializePreferences();
+    
+    initializePreferences(); // Must load 'universe' and 'protocol' here
     setupSensors();
-    setupLEDs();
+    setupLEDs(); // Assumed to initialize NeoPixel hardware if used
     setupWiFiManager();
+    
+    IDMXFrameHandler* activeHandler = nullptr;
+
+    if (/* check for output mode == SERIAL_DMX */ 0) { // Replace '1' with actual check
+        Serial.println("Using Serial DMX Output Handler.");
+        dmxOutputPtr = new HardwareSerialDMXOutput(Serial); 
+        serialDMXHandlerPtr = new SerialDMXFrameHandler(*dmxOutputPtr, universe); 
+        activeHandler = serialDMXHandlerPtr;
+    } else {
+        Serial.println("Using NeoPixel Output Handler.");
+        neoPixelHandlerPtr = new NeoPixelDMXFrameHandler(); // Assuming NeoPixel handler also needs universe
+        activeHandler = neoPixelHandlerPtr;
+    }
+
+    dmxoipHandlerPtr = new DMXoIPHandler(*activeHandler, artnet, e131);
+
+    statusLEDPtr = new StatusLED(*dmxoipHandlerPtr, *activeHandler);
+    statusLEDPtr->begin();
+
     switch (protocol) {
         case PROTO_ARTNET:
-            dmxoipHandler.setupArtNet();
+            dmxoipHandlerPtr->setupArtNet();
             break;
         case PROTO_E131:
-            dmxoipHandler.setupE131();
+            dmxoipHandlerPtr->setupE131();
             break;
         default:
             Serial.println("Unknown protocol selected.");
@@ -51,20 +73,27 @@ void setup()
 
 void loop()
 {
+    // Ensure the handler pointer is valid before use
+    if (!dmxoipHandlerPtr) return; 
+    
     switch (protocol) {
         case PROTO_ARTNET:
-            dmxoipHandler.readArtNet();
+            dmxoipHandlerPtr->readArtNet();
             break;
         case PROTO_E131:
-            dmxoipHandler.readE131();
+            dmxoipHandlerPtr->readE131();
             break;
         default:
             // Handle unknown protocol
             break;
     }
-    if (!dmxoipHandler.isReceiving()) {
+    if (!dmxoipHandlerPtr->isReceiving()) {
         handleWiFiManager();
         handleOTA();
     }
-    statusLED.update();
+    
+    // Ensure the status LED pointer is valid before use
+    if (statusLEDPtr) {
+        statusLEDPtr->update();
+    }
 }

@@ -1,13 +1,15 @@
 #include <unity.h>
 #include "StatusLED.h"
 #include "fakes/MockDMXStatus.h"
+#include "fakes/MockDMXFrameHandler.h"
 #include "fakes/ArduinoFake.h"
 
 void test_statusled_blinks_when_idle(void) {
     MockDMXStatus mockStatus;
+    MockDMXFrameHandler mockFrameHandler;
     mockStatus.receiving = false;
 
-    StatusLED led(mockStatus, LED_BUILTIN, 100, false);
+    StatusLED led(mockStatus, mockFrameHandler,  LED_BUILTIN, 100, false);
     led.begin();
 
     fakeMillis = 0;
@@ -29,10 +31,11 @@ void test_statusled_blinks_when_idle(void) {
 
 void test_statusled_solid_on_when_receiving_high_fps(void) {
     MockDMXStatus mockStatus;
+    MockDMXFrameHandler mockFrameHandler;
     mockStatus.receiving = true;
-    mockStatus.fps = 30;
+    mockFrameHandler.fps = 30;
 
-    StatusLED led(mockStatus, LED_BUILTIN, 500, false);
+    StatusLED led(mockStatus, mockFrameHandler, LED_BUILTIN, 500, false);
     led.begin();
 
     fakeMillis = 0;
@@ -42,10 +45,11 @@ void test_statusled_solid_on_when_receiving_high_fps(void) {
 
 void test_statusled_off_when_receiving_low_fps(void) {
     MockDMXStatus mockStatus;
+    MockDMXFrameHandler mockFrameHandler;
     mockStatus.receiving = true;
-    mockStatus.fps = 10;
+    mockFrameHandler.fps = 10;
 
-    StatusLED led(mockStatus, LED_BUILTIN, 500, false);
+    StatusLED led(mockStatus, mockFrameHandler, LED_BUILTIN, 500, false);
     led.begin();
 
     fakeMillis = 0;

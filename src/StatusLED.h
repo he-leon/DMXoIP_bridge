@@ -8,10 +8,11 @@
 #include <Arduino.h>
 #endif
 #include "interfaces/IDMXoIPStatus.h"
+#include "interfaces/IDMXFrameHandler.h"
 
 class StatusLED {
 public:
-  StatusLED(const IDMXoIPStatus& status, uint8_t pin = LED_BUILTIN,
+  StatusLED(const IDMXoIPStatus& status, const IDMXFrameHandler& frameHandler, uint8_t pin = LED_BUILTIN,
             unsigned long blinkInterval = 500, bool activeLow = false);
 
   void begin();
@@ -19,6 +20,7 @@ public:
 
 private:
   const IDMXoIPStatus& _status;
+  const IDMXFrameHandler& _frameHandler;
   uint8_t _pin;
   unsigned long _interval;
   bool _activeLow;

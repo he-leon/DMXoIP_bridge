@@ -1,7 +1,9 @@
 #include "StatusLED.h"
 
-StatusLED::StatusLED(const IDMXoIPStatus& status, uint8_t pin, unsigned long blinkInterval, bool activeLow)
-  : _status(status), _pin(pin), _interval(blinkInterval), _activeLow(activeLow),
+StatusLED::StatusLED(const IDMXoIPStatus& status,
+                     const IDMXFrameHandler& frameHandler,
+        uint8_t pin, unsigned long blinkInterval, bool activeLow)
+  : _status(status), _frameHandler(frameHandler), _pin(pin), _interval(blinkInterval), _activeLow(activeLow),
     _lastBlink(0), _ledOn(false) {}
 
 void StatusLED::begin() {
@@ -12,7 +14,7 @@ void StatusLED::begin() {
 void StatusLED::update() {
   if (_status.isReceiving()) {
     // Solid ON while receiving and FPS > 25 Hz
-    if (_status.getFrameRate() > 25)
+    if (_frameHandler.getFrameRate() > 25)
     {
         digitalWrite(_pin, _activeLow ? LOW : HIGH);
     }else {

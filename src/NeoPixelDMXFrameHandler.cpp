@@ -3,6 +3,10 @@
 #include "LEDConfig.h"
 #include <Arduino.h>
 
+static uint16_t frameCount = 0;
+static uint32_t lastFpsMicros = 0;
+static uint16_t currentFps = 0;  // Integer FPS
+
 NeoPixelDMXFrameHandler::NeoPixelDMXFrameHandler() 
     : currentBrightness(DEFAULT_BRIGHTNESS)
 {}
@@ -10,6 +14,8 @@ NeoPixelDMXFrameHandler::NeoPixelDMXFrameHandler()
 // ----------------- IDMXFrameHandler Implementation -----------------
 void NeoPixelDMXFrameHandler::handleFrame(uint16_t universeIn, uint16_t length, uint8_t* data) {
     if (universeIn != ::universe) return;
+    updateFrameRate();  // Update FPS counter
+    Serial.printf("CH1:%d, FPS:%d\n", data[0], getFrameRate());
     
     // Check if enough data is available for the simplest case (R, G, B channels)
     if (startAddress - 1 < 0 || (startAddress - 1 + 2) >= length) return;
@@ -67,5 +73,23 @@ void NeoPixelDMXFrameHandler::handleFrame(uint16_t universeIn, uint16_t length, 
     if (millis() - lastPowerCalc > 1000) { 
         calculatePowerUsage(); 
         lastPowerCalc = millis(); 
+    }
+}
+
+// ----------------- IDMXoIPStatus Implementation -----------------
+int NeoPixelDMXFrameHandler::getFrameRate() const {
+    return currentFps;
+}
+
+// ----------------- Frame rate counter -----------------
+void NeoPixelDMXFrameHandler::updateFrameRate() {
+    frameCount++;
+    uint32_t now = micros();
+    uint32_t elapsed = now - lastFpsMicros;
+    
+    if (elapsed >= 100000) {
+        currentFps = (frameCount * 1000000UL) / elapsed;  // Pure integer math
+        frameCount = 0;
+        lastFpsMicros = now;
     }
 }

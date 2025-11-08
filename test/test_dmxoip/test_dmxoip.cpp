@@ -76,29 +76,6 @@ void test_DMXoIPHandler_isReceiving_status() {
     TEST_ASSERT_FALSE(handler->isReceiving());
 }
 
-void test_DMXoIPHandler_getFrameRate_calculation() {
-    uint8_t data[] = {0};
-    
-    // 1. Initial frame to set up lastFpsMicros
-    handler->processFrame(0, 1, 1, data); 
-    
-    // 2. Send 10 frames total (1 + 9 loop iterations)
-    for (int i = 0; i < 9; ++i) {
-        handler->processFrame(0, 1, 1, data);
-        fakeMicros += 1000; // Advance minimally
-    }
-    
-    // 3. Advance to hit the 100ms update window (100000 us)
-    advance_time_ms(100); 
-    
-    // 4. Send the 11th frame to trigger the internal FPS update (11 frames / 0.1 sec = 110 FPS)
-    handler->processFrame(0, 1, 1, data);
-    
-    // Not a good test right now, FPS caclulation should be moved to FrameHandler
-    // and test should be improved
-    TEST_ASSERT_INT_WITHIN(20, 110, handler->getFrameRate()); // 110 FPS expected
-}
-
 
 // --- Frame Delegation Tests ---
 
@@ -163,7 +140,6 @@ void setup_test_runner() {
     RUN_TEST(test_DMXoIPHandler_setupArtNet_calls_begin_and_sets_callback);
     RUN_TEST(test_DMXoIPHandler_setupE131_calls_begin);
     RUN_TEST(test_DMXoIPHandler_isReceiving_status);
-    RUN_TEST(test_DMXoIPHandler_getFrameRate_calculation);
     RUN_TEST(test_DMXoIPHandler_delegates_ArtNet_frame);
     RUN_TEST(test_DMXoIPHandler_delegates_E131_frame);
     

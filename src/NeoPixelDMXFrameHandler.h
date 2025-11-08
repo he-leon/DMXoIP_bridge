@@ -16,6 +16,7 @@ public:
      * @brief Processes the DMX data and updates the LED strip.
      */
     void handleFrame(uint16_t universeIn, uint16_t length, uint8_t* data) override;
+    int getFrameRate() const override;
 
 private:
     // Tracking for single color mode to optimize updates
@@ -24,6 +25,9 @@ private:
     
     // Power calculation tracking
     unsigned long lastPowerCalc = 0;
+    unsigned long lastPacketTime = 0;
+
+    void updateFrameRate();
 };
 
 #endif // NEOPIXELDMXFRAMEHANDLER_H

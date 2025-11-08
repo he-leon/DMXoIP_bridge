@@ -18,6 +18,7 @@ public:
      * @param data Pointer to the DMX data array.
      */
     virtual void handleFrame(uint16_t universeIn, uint16_t length, uint8_t* data) = 0;
+    virtual int getFrameRate() const = 0;
 };
 
 #endif // IDMXFRAMEHANDLER_H

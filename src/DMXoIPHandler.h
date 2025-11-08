@@ -22,7 +22,6 @@ public:
     void setupE131();
     void readE131();
     bool isReceiving() const override;
-    int getFrameRate() const override;
     void processFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data);
     
 private:    
@@ -32,7 +31,6 @@ private:
     ESPAsyncE131& _e131;  // <-- Now a member
 
     void handleE131Packet(e131_packet_t* packet);
-    void updateFrameRate();
     unsigned long lastPacketTime = 0;
 };
 

@@ -20,24 +20,6 @@ DMXoIPHandler::DMXoIPHandler(IDMXFrameHandler& frameHandler,
     currentInstance = this;
 }
 
-// ----------------- Frame rate counter -----------------
-void DMXoIPHandler::updateFrameRate() {
-    frameCount++;
-    uint32_t now = micros();
-    uint32_t elapsed = now - lastFpsMicros;
-    
-    if (elapsed >= 100000) {
-        currentFps = (frameCount * 1000000UL) / elapsed;  // Pure integer math
-        frameCount = 0;
-        lastFpsMicros = now;
-    }
-}
-
-// ----------------- IDMXoIPStatus Implementation -----------------
-int DMXoIPHandler::getFrameRate() const {
-    return currentFps;
-}
-
 bool DMXoIPHandler::isReceiving() const {
     return (millis() - lastPacketTime) < PACKET_TIMEOUT_MS;
 }
@@ -45,10 +27,7 @@ bool DMXoIPHandler::isReceiving() const {
 // ----------------- DMX Frame Processing Proxy -----------------
 // This method is called by the Art-Net and E1.31 receivers
 void DMXoIPHandler::processFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data) {
-    updateFrameRate();
     lastPacketTime = millis();
-    
-    Serial.printf("CH1:%d, FPS:%d\n", data[0], getFrameRate());
     
     // Delegate the call to the handler via the interface
     _frameHandler.handleFrame(universeIn, length, data);
