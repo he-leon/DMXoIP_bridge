@@ -23,7 +23,6 @@ void updateFrameRate() {
         currentFps = (frameCount * 1000000UL) / elapsed;  // Pure integer math
         frameCount = 0;
         lastFpsMicros = now;
-        Serial.printf("FPS: %u\n", currentFps);
     }
 }
 
@@ -37,6 +36,7 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
     updateFrameRate();  // <--- Update FPS counter
     if (universeIn != ::universe) return;
     lastPacketTime = millis();
+    // Used for latency measurements with Python script
     Serial.printf("CH1:%d, FPS:%d\n", data[0], getFrameRate());
     if (startAddress - 1 < 0 || (startAddress - 1 + 2) >= length) return;
 
@@ -97,7 +97,7 @@ void readArtNet() { artnet.read(); }
 
 // ----------------- E1.31 -----------------
 void setupE131() {
-    if (e131.begin(E131_MULTICAST)) Serial.println("E1.31 receiver initialized");
+    if (e131.begin(E131_MULTICAST, universe=universe)) Serial.println("E1.31 receiver initialized");
     else Serial.println("E1.31 failed to start!");
 }
 
