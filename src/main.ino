@@ -1,6 +1,6 @@
 #include <WiFiManager.h>
-// #include "ArtNetHandler.h" <-- REMOVE
-#include "DMXoIPHandler.h" // <-- ADD
+#include "DMXoIPHandler.h"
+#include "NeoPixelDMXFrameHandler.h" // <-- ADD
 #include "ConfigParameters.h"
 #include "LEDConfig.h"
 #include "Sensors.h"
@@ -8,10 +8,15 @@
 #include "SPIFFS.h"
 #include "StatusLED.h"
 
-// Instantiate the new DMXoIPHandler
-DMXoIPHandler dmxoipHandler;
 
-// Pass the handler instance directly to StatusLED, as it implements IDMXoIPStatus
+ArtnetWifi artnet;
+ESPAsyncE131 e131;
+
+NeoPixelDMXFrameHandler dmxFrameHandler;
+
+DMXoIPHandler dmxoipHandler(dmxFrameHandler, artnet, e131);
+
+// Pass the DMXoIPHandler instance (which implements IDMXoIPStatus) to StatusLED
 StatusLED statusLED(dmxoipHandler);
 
 void setup()
@@ -30,7 +35,7 @@ void setup()
     setupWiFiManager();
     switch (protocol) {
         case PROTO_ARTNET:
-            dmxoipHandler.setupArtNet(); 
+            dmxoipHandler.setupArtNet();
             break;
         case PROTO_E131:
             dmxoipHandler.setupE131();
@@ -48,17 +53,16 @@ void loop()
 {
     switch (protocol) {
         case PROTO_ARTNET:
-            dmxoipHandler.readArtNet(); // <-- CALL METHOD
+            dmxoipHandler.readArtNet();
             break;
         case PROTO_E131:
-            dmxoipHandler.readE131(); // <-- CALL METHOD
+            dmxoipHandler.readE131();
             break;
         default:
             // Handle unknown protocol
             break;
     }
-    // Change: isReceiving() is now a method of the dmxoipHandler object
-    if (!dmxoipHandler.isReceiving()) { // <-- CALL METHOD
+    if (!dmxoipHandler.isReceiving()) {
         handleWiFiManager();
         handleOTA();
     }
