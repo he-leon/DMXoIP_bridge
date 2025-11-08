@@ -1,20 +1,21 @@
 #include <ArtnetWifi.h>
 #include "ConfigParameters.h"
-#include "ArtNetHandler.h"
+#include "DMXoIPHandler.h"
 #include "LEDConfig.h"
 
-ArtnetWifi artnet;
-ESPAsyncE131 e131;
+static ArtnetWifi artnet;
+static ESPAsyncE131 e131;
 
-RgbColor currentColor(0);
-uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
-unsigned long lastPacketTime = 0;
+static RgbColor currentColor(0);
+static uint8_t currentBrightness = DEFAULT_BRIGHTNESS;
 
 static uint16_t frameCount = 0;
 static uint32_t lastFpsMicros = 0;
 static uint16_t currentFps = 0;  // Integer FPS
 
-void updateFrameRate() {
+
+// ----------------- Frame rate counter -----------------
+void DMXoIPHandler::updateFrameRate() {
     frameCount++;
     uint32_t now = micros();
     uint32_t elapsed = now - lastFpsMicros;
@@ -26,13 +27,17 @@ void updateFrameRate() {
     }
 }
 
-
-uint16_t getFrameRate() {
+// ----------------- IDMXoIPStatus Implementation -----------------
+int DMXoIPHandler::getFrameRate() const {
     return currentFps;
 }
 
+bool DMXoIPHandler::isReceiving() const {
+    return (millis() - lastPacketTime) < PACKET_TIMEOUT_MS;
+}
+
 // ----------------- DMX Frame Handler -----------------
-void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data) {
+void DMXoIPHandler::onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data) {
     updateFrameRate();  // <--- Update FPS counter
     if (universeIn != ::universe) return;
     lastPacketTime = millis();
@@ -87,35 +92,55 @@ void onDmxFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t*
 }
 
 // ----------------- Art-Net -----------------
-void setupArtNet() {
+void DMXoIPHandler::setupArtNet() {
+    // Need a wrapper lambda/function to capture 'this' for the static callback
+    // A C-style callback must be static, or a lambda that captures 'this'.
+    // Since ArtnetWifi requires a C-style function pointer, we'll use a static
+    // function and a global/static pointer to the instance if multiple instances
+    // aren't needed, or a capture-less lambda if the library supports it.
+    // For now, let's keep it simple with a C++ lambda (if the library supports C++ lambda as callback)
+    // or a static proxy function. ArtnetWifi's setArtDmxCallback takes a C-style function.
+    // For now, let's use a static proxy that assumes a single instance, which is common in Arduino.
+    
+    // ArtnetWifi doesn't directly support a class method as a callback, 
+    // so we need a static proxy and a way to access the instance.
+    // For simplicity in this refactor, let's assume one instance is used globally.
+    // **NOTE**: In a more complex design, you'd use a singleton pattern or a global pointer.
+    
+    // Temporary static proxy for the callback to call the member function.
+    static DMXoIPHandler* currentInstance = this;
+    
     artnet.begin();
-    artnet.setArtDmxCallback(onDmxFrame);
+    artnet.setArtDmxCallback([](uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data) {
+        if (currentInstance) {
+            currentInstance->onDmxFrame(universe, length, sequence, data);
+        }
+    });
     Serial.println("Art-Net initialized and ready.");
 }
 
-void readArtNet() { artnet.read(); }
+void DMXoIPHandler::readArtNet() { artnet.read(); }
 
 // ----------------- E1.31 -----------------
-void setupE131() {
-    if (e131.begin(E131_MULTICAST, universe=universe)) Serial.println("E1.31 receiver initialized");
-    else Serial.println("E1.31 failed to start!");
-}
-
-void handleE131Packet(e131_packet_t* packet) {
+void DMXoIPHandler::handleE131Packet(e131_packet_t* packet) {
     uint16_t universe = htons(packet->universe);
     uint16_t length = htons(packet->property_value_count) - 1;
     uint8_t* data = packet->property_values + 1;
     onDmxFrame(universe, length, packet->sequence_number, data);
 }
 
-void readE131() {
+void DMXoIPHandler::setupE131() {
+    // Similar problem with E1.31 library's callback. ESPAsyncE131 uses a poll method.
+    if (e131.begin(E131_MULTICAST, universe=universe)) Serial.println("E1.31 receiver initialized");
+    else Serial.println("E1.31 failed to start!");
+}
+
+void DMXoIPHandler::readE131() {
     if (!e131.isEmpty()) {
         e131_packet_t packet;
-        while (!e131.isEmpty()) { e131.pull(&packet); handleE131Packet(&packet); }
+        while (!e131.isEmpty()) { 
+            e131.pull(&packet); 
+            handleE131Packet(&packet); 
+        }
     }
 }
-
-bool isReceiving() {
-    return (millis() - lastPacketTime) < PACKET_TIMEOUT_MS;
-}
-
