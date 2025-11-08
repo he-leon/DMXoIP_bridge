@@ -39,7 +39,7 @@ void setup()
     
     IDMXFrameHandler* activeHandler = nullptr;
 
-    if (/* check for output mode == SERIAL_DMX */ 0) { // Replace '1' with actual check
+    if (/* check for output mode == SERIAL_DMX */ 1) { // Replace '1' with actual check
         Serial.println("Using Serial DMX Output Handler.");
         dmxOutputPtr = new HardwareSerialDMXOutput(Serial); 
         serialDMXHandlerPtr = new SerialDMXFrameHandler(*dmxOutputPtr, universe); 

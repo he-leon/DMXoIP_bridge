@@ -14,7 +14,6 @@ SerialDMXFrameHandler::SerialDMXFrameHandler(IDMXOutput& dmxOutput, uint16_t tar
       _targetUniverse(targetUniverse) {}
 
 void SerialDMXFrameHandler::handleFrame(uint16_t universeIn, uint16_t length, uint8_t* data) {
-    Serial.printf("Received DMX frame for U%u with length %u.\n", universeIn, length);
     if (universeIn != _targetUniverse) {
         return;
     }
@@ -23,7 +22,6 @@ void SerialDMXFrameHandler::handleFrame(uint16_t universeIn, uint16_t length, ui
         Serial.printf("Warning: Received DMX frame for U%u with invalid length %u.\n", universeIn, length);
         return;
     }
-    Serial.printf("Forwarding DMX frame for U%u with length %u to output.\n", universeIn, length);
     _dmxOutput.writeFrame(length, data);
 }
 
