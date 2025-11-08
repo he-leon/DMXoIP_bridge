@@ -6,8 +6,13 @@
 #include "NetworkConfig.h"
 #include "SPIFFS.h"
 #include "StatusLED.h"
+#include "DMXoIPStatusAdapter.h"
 
-StatusLED statusLED; // uses LED_BUILTIN by default
+// Will be delivered by the refactored DMXoIPHandler class 
+// in the future, when we got rid of the global stuff.
+DMXoIPStatusAdapter DMXoIPStatus; 
+
+StatusLED statusLED(DMXoIPStatus);
 
 void setup()
 {
