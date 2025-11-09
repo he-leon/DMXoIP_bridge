@@ -3,22 +3,19 @@
 #include "NeoPixelDMXFrameHandler.h"
 #include "SerialDMXFrameHandler.h"
 #include "HardwareSerialDMXOutput.h"
-#include "ConfigParameters.h" // Assumed to define 'universe', 'protocol', PROTO_ARTNET, etc.
+#include "ConfigParameters.h" // Includes universe, protocol, and new outputMode
 #include "LEDConfig.h"
 #include "Sensors.h"
 #include "NetworkConfig.h"
 #include "SPIFFS.h"
 #include "StatusLED.h"
 
+// --- Global Objects (Required for DMXoIPHandler constructor) ---
 ArtnetWifi artnet;
 ESPAsyncE131 e131;
 
-NeoPixelDMXFrameHandler* neoPixelHandlerPtr = nullptr;
-HardwareSerialDMXOutput* dmxOutputPtr = nullptr; // Note: We use a pointer here too
-SerialDMXFrameHandler* serialDMXHandlerPtr = nullptr;
-
+// --- Global Pointers (Required for loop() execution) ---
 DMXoIPHandler* dmxoipHandlerPtr = nullptr;
-
 StatusLED* statusLEDPtr = nullptr;
 
 
@@ -32,27 +29,36 @@ void setup()
         return;
     }
     
-    initializePreferences(); // Must load 'universe' and 'protocol' here
+    initializePreferences(); // Loads 'universe', 'protocol', and 'outputMode'
     setupSensors();
-    setupLEDs(); // Assumed to initialize NeoPixel hardware if used
+    setupLEDs(); // Assumed to initialize NeoPixel hardware if needed
     setupWiFiManager();
     
+    // --- Local Pointers for Initialization ---
     IDMXFrameHandler* activeHandler = nullptr;
+    HardwareSerialDMXOutput* dmxOutputPtr = nullptr;
+    NeoPixelDMXFrameHandler* neoPixelHandlerPtr = nullptr;
+    SerialDMXFrameHandler* serialDMXHandlerPtr = nullptr;
 
-    if (/* check for output mode == SERIAL_DMX */ 0) { // Replace '1' with actual check
+    // --- Phase 1: Instantiate Active Handler based on new config ---
+    if (outputMode == OUTPUT_DMX512) { 
         Serial.println("Using Serial DMX Output Handler.");
+        // Using Serial (UART0) for DMX. Assumes debug is on Serial1 or disabled.
+        // If Serial is for debug, change this to Serial1 or Serial2
         dmxOutputPtr = new HardwareSerialDMXOutput(Serial); 
         serialDMXHandlerPtr = new SerialDMXFrameHandler(*dmxOutputPtr, universe); 
         activeHandler = serialDMXHandlerPtr;
-    } else {
+    } else { // Default to NeoPixel
         Serial.println("Using NeoPixel Output Handler.");
-        neoPixelHandlerPtr = new NeoPixelDMXFrameHandler(); // Assuming NeoPixel handler also needs universe
+        neoPixelHandlerPtr = new NeoPixelDMXFrameHandler();
         activeHandler = neoPixelHandlerPtr;
     }
 
+    // --- Phase 2: Instantiate Global Handlers ---
     dmxoipHandlerPtr = new DMXoIPHandler(*activeHandler, artnet, e131);
-
     statusLEDPtr = new StatusLED(*dmxoipHandlerPtr, *activeHandler);
+    
+    // --- Phase 3: Setup ---
     statusLEDPtr->begin();
 
     switch (protocol) {
@@ -73,7 +79,8 @@ void setup()
 
 void loop()
 {
-    // Ensure the handler pointer is valid before use
+    // Execution relies only on the globally accessible dmxoipHandlerPtr and statusLEDPtr
+    
     if (!dmxoipHandlerPtr) return; 
     
     switch (protocol) {
@@ -92,7 +99,6 @@ void loop()
         handleOTA();
     }
     
-    // Ensure the status LED pointer is valid before use
     if (statusLEDPtr) {
         statusLEDPtr->update();
     }

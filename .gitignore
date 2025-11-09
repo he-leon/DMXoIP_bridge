@@ -3,3 +3,5 @@ compile_commands.json
 .cache
 *.py
 *.csv
+config.json
+wifi_config.json

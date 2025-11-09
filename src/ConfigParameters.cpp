@@ -11,6 +11,7 @@ String deviceName = defaultDeviceName;
 
 ProtocolType protocol = PROTO_E131;
 ColorModeType colorMode = COLOR_MODE_MULTIPLE;
+OutputModeType outputMode = OUTPUT_NEOPIXEL; // <-- NEW: Default to NeoPixel
 
 const char *configFilePath = "/config.json";
 const char *wifiConfigFilePath = "/wifi_config.json";
@@ -23,6 +24,7 @@ WiFiManagerParameter custom_startAddress("startAddress", "Start Address", String
 WiFiManagerParameter custom_deviceName("deviceName", "Device Name", defaultDeviceName.c_str(), 32);
 WiFiManagerParameter custom_protocol("protocol", "Protocol", String(protocol).c_str(), 1);
 WiFiManagerParameter custom_colorMode("colorMode", "LED Addressing", String(colorMode).c_str(), 1); 
+WiFiManagerParameter custom_outputMode("outputMode", "Output Mode", String(outputMode).c_str(), 1); // <-- NEW
 
 const char *protocolDropdownStr = R"(
   <label for='protocol_dummy'>Protocol</label>
@@ -41,6 +43,16 @@ const char *colorModeDropdownStr = R"(
   </select>
 )";
 WiFiManagerParameter custom_colorMode_select(colorModeDropdownStr);
+
+// --- NEW: Output Mode Dropdown ---
+const char *outputModeDropdownStr = R"(
+  <label for='outputMode_dummy'>Output Mode</label>
+  <select name='outputMode_dummy' id='outputMode_dummy' class='button'>
+    <option value='0'>NeoPixel</option>
+    <option value='1'>DMX512</option>
+  </select>
+)";
+WiFiManagerParameter custom_outputMode_select(outputModeDropdownStr);
 
 // ----------------- Wi-Fi Config -----------------
 void loadWiFiConfigs() {
@@ -114,11 +126,12 @@ void loadPreferences() {
         deviceName = json["deviceName"] | defaultDeviceName;
         protocol = static_cast<ProtocolType>(json["protocol"] | PROTO_E131);
         colorMode = static_cast<ColorModeType>(json["colorMode"] | COLOR_MODE_MULTIPLE);
+        outputMode = static_cast<OutputModeType>(json["outputMode"] | OUTPUT_NEOPIXEL); // <-- NEW
     }
     configFile.close();
     Serial.printf(
-        "Loaded preferences - numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, protocol: %d, colorMode: %d\n",
-        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode
+        "Loaded preferences - numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, protocol: %d, colorMode: %d, outputMode: %d\n", // <-- MODIFIED
+        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode, outputMode // <-- MODIFIED
     );
 }
 
@@ -127,14 +140,13 @@ void savePreferences() {
     if (!configFile) { Serial.println("Failed to open config file for writing"); return; }
     Serial.println("Saving preferences to SPIFFS...");
     Serial.printf(
-        "numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, protocol: %d, colorMode: %d\n",
-        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode
+        "numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, protocol: %d, colorMode: %d, outputMode: %d\n", // <-- MODIFIED
+        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode, outputMode // <-- MODIFIED
     );
 
     configFile.printf(
-        "{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, \"deviceName\": \"%s\", \"protocol\": %d, \"colorMode\": %d}\n",
-        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode
+        "{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, \"deviceName\": \"%s\", \"protocol\": %d, \"colorMode\": %d, \"outputMode\": %d}\n", // <-- MODIFIED
+        numLeds, universe, startAddress, deviceName.c_str(), protocol, colorMode, outputMode // <-- MODIFIED
     );
     configFile.close();
 }
-
