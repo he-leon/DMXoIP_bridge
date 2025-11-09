@@ -17,6 +17,7 @@ ESPAsyncE131 e131;
 // --- Global Pointers (Required for loop() execution) ---
 DMXoIPHandler* dmxoipHandlerPtr = nullptr;
 StatusLED* statusLEDPtr = nullptr;
+HardwareSerialDMXOutput* dmxOutputPtr = nullptr;
 
 
 void setup()
@@ -36,7 +37,6 @@ void setup()
     
     // --- Local Pointers for Initialization ---
     IDMXFrameHandler* activeHandler = nullptr;
-    HardwareSerialDMXOutput* dmxOutputPtr = nullptr;
     NeoPixelDMXFrameHandler* neoPixelHandlerPtr = nullptr;
     SerialDMXFrameHandler* serialDMXHandlerPtr = nullptr;
 
@@ -94,6 +94,7 @@ void loop()
             // Handle unknown protocol
             break;
     }
+    dmxOutputPtr->sendDMX(); 
     if (!dmxoipHandlerPtr->isReceiving()) {
         handleWiFiManager();
         handleOTA();
