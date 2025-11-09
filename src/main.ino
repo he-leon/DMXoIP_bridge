@@ -45,7 +45,7 @@ void setup()
         Serial.println("Using Serial DMX Output Handler.");
         // Using Serial (UART0) for DMX. Assumes debug is on Serial1 or disabled.
         // If Serial is for debug, change this to Serial1 or Serial2
-        dmxOutputPtr = new HardwareSerialDMXOutput(Serial); 
+        dmxOutputPtr = new HardwareSerialDMXOutput(Serial2); 
         serialDMXHandlerPtr = new SerialDMXFrameHandler(*dmxOutputPtr, universe); 
         activeHandler = serialDMXHandlerPtr;
     } else { // Default to NeoPixel
