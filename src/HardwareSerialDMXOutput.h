@@ -4,7 +4,6 @@
 
 #include "interfaces/IDMXOutput.h"
 #include <Arduino.h>
-#include <easydmx.h>
 
 class HardwareSerialDMXOutput : public IDMXOutput {
 public:
@@ -14,7 +13,6 @@ public:
 
 private:
     HardwareSerial& _serialPort;
-    EasyDMX _dmx;
     
     static constexpr uint16_t DMX_BREAK_TIME_US = 92;
     static constexpr uint16_t DMX_MAB_TIME_US   = 12;
