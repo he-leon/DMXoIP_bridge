@@ -13,7 +13,7 @@
 class StatusLED {
 public:
   StatusLED(const IDMXoIPStatus& status, const IDMXFrameHandler& frameHandler, uint8_t pin = LED_BUILTIN,
-            unsigned long blinkInterval = 500, bool activeLow = false);
+            unsigned long blinkInterval = 500, bool activeLow = true);
 
   void begin();
   void update();
