@@ -5,12 +5,16 @@ import threading
 import re
 
 # ---------------- Configuration ----------------
-SERIAL_PORT   = '/dev/ttyACM0'  # ESP32 serial port on Linux
+SERIAL_PORT   = '/dev/ttyACM1'  # ESP32 serial port on Linux
 BAUDRATE      = 115200
 UNIVERSE      = 1
 NUM_CHANNELS  = 512         # E1.31 universe size
-PACKET_INTERVAL_HZ = 50        # in Hz
+PACKET_INTERVAL_HZ = 100        # in Hz
 # -----------------------------------------------
+
+def log(msg):
+    """Simple logger with timestamp in ms resolution."""
+    print(f"[{time.strftime('%H:%M:%S')}.{int((time.time()%1)*1000):03d}] {msg}")
 
 # Open serial port
 ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=0.1)
@@ -21,6 +25,7 @@ sender.activate_output(UNIVERSE)
 #sender[UNIVERSE].multicast = False
 #sender[UNIVERSE].destination = "192.168.178.196"
 sender[UNIVERSE].multicast = True
+sender[UNIVERSE].manual_flush = True
 sender.start()
 
 # ---------------- Serial reader ----------------
@@ -40,18 +45,20 @@ def serial_reader():
         line = ser.readline().decode(errors='ignore').strip()
         if not line:
             continue
+        #log(f"Serial line: {line}")
         m = pattern.search(line)
         if m:
             seq = int(m.group(1))
             now = time.time()
-
+            #log(f"  -> parsed seq: {seq} at {now:.3f}")
             if seq in send_times:
                 latency_s = now - send_times[seq]
+                #log(f"  -> matched seq: {seq}, latency: {latency_s*1000:.2f} ms")
                 with fps_lock:
                     received_count += 1
                     second_latencies.append(latency_s)
 
-        # Once per second, print stats
+        # Once per second, log stats
         now = time.time()
         if now - last_fps_time >= 0.1:
             with fps_lock:
@@ -65,7 +72,7 @@ def serial_reader():
                 else:
                     mean_latency = min_latency = max_latency = 0
 
-                print(
+                log(
                     f"Received FPS: {fps:.1f}, "
                     f"Mean latency: {mean_latency*1000:.2f} ms, "
                     f"Min: {min_latency*1000:.2f} ms, "
@@ -83,9 +90,13 @@ reader_thread.start()
 
 # ---------------- Send loop ----------------
 sequence = 0
-print("Starting sACN sender... Ctrl+C to stop.")
+last_update_time = 0
+log("Starting sACN sender... Ctrl+C to stop.")
 try:
     while True:
+        if time.time() - last_update_time < (1 / PACKET_INTERVAL_HZ):
+            time.sleep(0.001)
+            continue
         data = [0] * NUM_CHANNELS
         # Will result in repating fade-in of red channel of first 4 LEDs 
         # Fade Up takes 256 packets (e.g. 40Hz = ~6.4s)
@@ -97,17 +108,21 @@ try:
 
 
         sender[UNIVERSE].dmx_data = tuple(data)
-        send_times[sequence] = time.time()
+        last_update_time = time.time()
+        send_times[sequence] = last_update_time 
+
+        #log(f"Sent seq: {sequence} at {send_times[sequence]:.3f}")
 
         sequence = (sequence + 1) % 256
-        time.sleep(1 / PACKET_INTERVAL_HZ)
+        sender.flush()
+
 
 except KeyboardInterrupt:
-    print("\nStopping sender.")
+    log("\nStopping sender.")
     sender.stop()
     if latencies:
         avg = sum(latencies)/len(latencies)
-        print(f"Average latency: {avg*1000:.2f} ms")
-        print(f"Min latency: {min(latencies)*1000:.2f} ms")
-        print(f"Max latency: {max(latencies)*1000:.2f} ms")
+        log(f"Average latency: {avg*1000:.2f} ms")
+        log(f"Min latency: {min(latencies)*1000:.2f} ms")
+        log(f"Max latency: {max(latencies)*1000:.2f} ms")
 
