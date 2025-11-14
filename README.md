@@ -124,6 +124,30 @@ The following pins are are used:
 * **DMX512 Output**: GPIO 17 (UART2 TX)
 * **Status LED**: Built-in LED (usually GPIO 2 on most ESP32 boards)
 
+## Changing NeoPixel Type
+
+Different NeoPixel/WS28xx LED strips use different color orders (RGB, GRB, etc.) and protocols. To configure the correct type for your LED strip, edit the `platformio.ini` file and uncomment/modify the `NEOFEATURE` build flag:
+
+```ini
+build_flags =
+    -DBOARD_HAS_PSRAM
+    -mfix-esp32-psram-cache-issue
+    -DNEOFEATURE=NeoGrbFeature
+```
+
+Available NEOFEATURE options:
+* `NeoGrbFeature` - Most common WS2812B LEDs (default if not specified)
+* `NeoRgbFeature` - RGB color order
+* `NeoBrgFeature` - BRG color order
+* `NeoBgrFeature` - BGR color order
+* `NeoRbgFeature` - RBG color order
+* `NeoGrb48Feature` - GRB with 48-bit color depth
+* `NeoRgb48Feature` - RGB with 48-bit color depth
+* `NeoGrbWs2816Feature` - For WS2816 LEDs
+* `NeoRgbUcs8903Feature` - For UCS8903 LEDs
+
+After changing the NEOFEATURE value, rebuild and upload the firmware with `pio run -t upload`.
+
 ## Protocols
 
 ### Art-Net
