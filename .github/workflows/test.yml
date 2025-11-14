@@ -11,6 +11,8 @@ on:
       - 'src/**'
       - 'platformio.ini'
       - 'test/**'
+  workflow_dispatch:
+
 
 jobs:
   test:
@@ -48,22 +50,22 @@ jobs:
         run: |
           pio test -e unit_tests --verbose
       
-      - name: Generate coverage report
-        run: |
-          gcovr --root . --filter 'src/.*' --xml -o coverage.xml --html-details -o coverage.html
-        continue-on-error: true
+      # - name: Generate coverage report
+      #   run: |
+      #     gcovr --root . --filter 'src/.*' --xml -o coverage.xml --html-details -o coverage.html
+      #   continue-on-error: true
       
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: |
-            coverage.xml
-            coverage.html
-            coverage.*.html
-        if: always()
-      
-      - name: Coverage summary
-        run: |
-          gcovr --root . --filter 'src/.*'
-        continue-on-error: true
+      # - name: Upload coverage reports
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: coverage-report
+      #     path: |
+      #       coverage.xml
+      #       coverage.html
+      #       coverage.*.html
+      #   if: always()
+      # 
+      # - name: Coverage summary
+      #   run: |
+      #     gcovr --root . --filter 'src/.*'
+      #   continue-on-error: true
