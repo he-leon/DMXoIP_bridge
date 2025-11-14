@@ -116,6 +116,14 @@ The device can be configured through the web interface:
 * **LED Configuration**: Set number of LEDs and addressing mode
 * **DMX Settings**: Configure universe and start address
 
+## Pin Configuration
+
+The following pins are are used:
+
+* **NeoPixel / WS2812**: GPIO 16
+* **DMX512 Output**: GPIO 17 (UART2 TX)
+* **Status LED**: Built-in LED (usually GPIO 2 on most ESP32 boards)
+
 ## Protocols
 
 ### Art-Net
