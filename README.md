@@ -4,7 +4,7 @@ Status: WIP but functional
 
 This project turns an **ESP32** into a flexible lighting bridge that receives DMX-over-IP data and outputs it to LEDs or DMX devices. It supports multiple protocols, output types, and includes an onboard Wi-Fi setup page.
 
-## 🚀 What It Does
+## What It Does
 
 The ESP32 acts as a DMX-over-IP receiver and lighting controller. It can receive:
 
@@ -18,7 +18,7 @@ And it outputs to:
 * **DMX512 (hardware serial)**
 * **DMX_ESPNOW broadcast**
 
-## ✨ Features
+## Features
 
 ### Wi-Fi Setup with WiFiManager
 
@@ -50,7 +50,7 @@ And it outputs to:
 | **DMX512**         | Outputs DMX via UART             |
 | **DMX_ESPNOW**     | Broadcasts DMX frames wirelessly |
 
-## 🗂 Project Structure
+## Project Structure
 
 ### Core Files
 
@@ -66,7 +66,7 @@ And it outputs to:
 * **StatusLED.*** — Diagnostic/status LED handling
 * **interfaces/*** — Clean input/output interface classes
 
-## 🧩 How to Use
+## How to Use
 
 1. Flash the firmware onto an **ESP32**.
 2. On first boot, connect to the ESP32 Wi-Fi AP.
@@ -79,7 +79,7 @@ And it outputs to:
 5. Save + reboot.
 6. Send Art-Net or sACN from your lighting software to the device.
 
-## 📦 Requirements
+## Requirements
 
 * **ESP32 board**
 * Optional:
@@ -87,7 +87,7 @@ And it outputs to:
   * RS485 DMX transceiver module (for DMX512 output)
   * Additional ESP32 (for DMX_ESPNOW networks)
 
-## 📚 Used Libraries
+## Used Libraries
 
 * **[WiFiManager](https://github.com/he-leon/WiFiManager)** - Web-based configuration portal for WiFi credentials
 * **[ArtnetWifi](https://github.com/yakamoz423/ArtnetWifi)** - Art-Net protocol implementation
@@ -98,7 +98,7 @@ And it outputs to:
 * **[ESPAsyncE131](https://github.com/forkineye/ESPAsyncE131)** - sACN/E1.31 protocol implementation
 * **[esp_dmxnow](https://github.com/he-leon/esp_dmxnow)** - Custom ESP-NOW DMX protocol implementation
 
-## 🔧 Installation
+## Installation
 
 1. Install PlatformIO
 2. Clone this repository
@@ -106,7 +106,7 @@ And it outputs to:
 4. Connect to the ESP32 Wi-Fi network on first boot
 5. Configure via web interface
 
-## 🛠 Configuration
+## Configuration
 
 The device can be configured through the web interface:
 
@@ -116,7 +116,7 @@ The device can be configured through the web interface:
 * **LED Configuration**: Set number of LEDs and addressing mode
 * **DMX Settings**: Configure universe and start address
 
-## 📡 Protocols
+## Protocols
 
 ### Art-Net
 
@@ -130,7 +130,7 @@ ETC's streaming ACN protocol, efficient for multicast DMX distribution.
 
 Custom wireless DMX protocol using ESP-NOW for latency.
 
-## 💡 Outputs
+## Outputs
 
 ### NeoPixel / WS2812
 
