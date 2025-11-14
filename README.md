@@ -87,6 +87,17 @@ And it outputs to:
   * RS485 DMX transceiver module (for DMX512 output)
   * Additional ESP32 (for DMX_ESPNOW networks)
 
+## 📚 Used Libraries
+
+* **[WiFiManager](https://github.com/he-leon/WiFiManager)** - Web-based configuration portal for WiFi credentials
+* **[ArtnetWifi](https://github.com/yakamoz423/ArtnetWifi)** - Art-Net protocol implementation
+* **[ArduinoJson](https://arduinojson.org/)** - JSON parsing and generation
+* **[DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library)** - DS18B20 temperature sensor support
+* **[OneWire](https://github.com/PaulStoffregen/OneWire)** - OneWire protocol for DS18B20 sensors
+* **[NeoPixelBus](https://github.com/Makuna/NeoPixelBus)** - WS2812/NeoPixel LED control
+* **[ESPAsyncE131](https://github.com/forkineye/ESPAsyncE131)** - sACN/E1.31 protocol implementation
+* **[esp_dmxnow](https://github.com/he-leon/esp_dmxnow)** - Custom ESP-NOW DMX protocol implementation
+
 ## 🔧 Installation
 
 1. Install PlatformIO
