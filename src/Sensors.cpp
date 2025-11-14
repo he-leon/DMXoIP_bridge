@@ -1,29 +1,25 @@
 #include "Sensors.h"
-#include <DallasTemperature.h>
-#include <OneWire.h>
+
 #include <Arduino.h>
 
-const int oneWirePin = 27;     
-float currentTemperature = 0.0; // Variable to store the temperature
-float currentInternalTemperature = 0.0; // Variable to store the internal temperature
-                                        //
-OneWire oneWire(oneWirePin); 
+#include <DallasTemperature.h>
+#include <OneWire.h>
 
-// Pass our oneWire reference to Dallas Temperature sensor 
+const int oneWirePin             = 27;
+float currentTemperature         = 0.0;  // Variable to store the temperature
+float currentInternalTemperature = 0.0;  // Variable to store the internal temperature
+                                         //
+OneWire oneWire(oneWirePin);
+
+// Pass our oneWire reference to Dallas Temperature sensor
 DallasTemperature sensors(&oneWire);
 
-long lastUpdate = 0;
-const long SENSOR_UPDATE_INTERVAL = 5000; // Update interval in milliseconds
+long lastUpdate                   = 0;
+const long SENSOR_UPDATE_INTERVAL = 5000;  // Update interval in milliseconds
 
-void setupSensors()
-{
-  sensors.begin();
-}
+void setupSensors() { sensors.begin(); }
 
-void updateSensors()
-{
-  sensors.requestTemperatures(); 
-}
+void updateSensors() { sensors.requestTemperatures(); }
 
 void handleSensors()
 {
@@ -40,5 +36,3 @@ void handleSensors()
     Serial.println("ºC");
   }
 }
-
-

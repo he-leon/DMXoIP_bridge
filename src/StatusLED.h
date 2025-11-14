@@ -1,24 +1,28 @@
 #ifndef STATUS_LED_H
 #define STATUS_LED_H
-#endif  
+#endif
 
 #ifdef UNIT_TEST
 #include "fakes/ArduinoFake.h"
 #else
 #include <Arduino.h>
 #endif
-#include "interfaces/IDMXoIPStatus.h"
 #include "interfaces/IDMXFrameHandler.h"
+#include "interfaces/IDMXoIPStatus.h"
 
-class StatusLED {
-public:
-  StatusLED(const IDMXoIPStatus& status, const IDMXFrameHandler& frameHandler, uint8_t pin = LED_BUILTIN,
-            unsigned long blinkInterval = 500, bool activeLow = true);
+class StatusLED
+{
+ public:
+  StatusLED(const IDMXoIPStatus& status,
+            const IDMXFrameHandler& frameHandler,
+            uint8_t pin                 = LED_BUILTIN,
+            unsigned long blinkInterval = 500,
+            bool activeLow              = true);
 
   void begin();
   void update();
 
-private:
+ private:
   const IDMXoIPStatus& _status;
   const IDMXFrameHandler& _frameHandler;
   uint8_t _pin;

@@ -10,4 +10,3 @@ void setupMenu();
 void bindServerCallback();
 
 #endif  // NETWORKCONFIG_H
-

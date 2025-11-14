@@ -16,36 +16,47 @@ WiFiManager wm;
 
 void performRestart() { ESP.restart(); }
 
+void handleFileDownload()
+{
+  if (!wm.server)
+    return;
 
-void handleFileDownload() {
-    if (!wm.server) return; 
+  if (!wm.server->hasArg("name"))
+  {
+    wm.server->send(400, "text/plain", "Error: Missing 'name' parameter.");
+    return;
+  }
 
-    if (!wm.server->hasArg("name")) {
-        wm.server->send(400, "text/plain", "Error: Missing 'name' parameter.");
-        return;
+  String filename = wm.server->arg("name");
+  String fullPath = "/" + filename;
+
+  if (fullPath == "/config.json" || fullPath == "/wifi_config.json")
+  {
+    if (SPIFFS.exists(fullPath))
+    {
+      File file = SPIFFS.open(fullPath, "r");
+      if (file)
+      {
+        // Den Dateinamen für den Browser im Header senden (optional, aber nützlich)
+        wm.server->sendHeader("Content-Disposition", "attachment; filename=" + filename);
+        wm.server->streamFile(file, "application/json");
+        file.close();
+        Serial.printf("Served dynamic file: %s via GET parameter.\n", fullPath.c_str());
+      }
+      else
+      {
+        wm.server->send(500, "text/plain", "File could not be opened.");
+      }
     }
-
-    String filename = wm.server->arg("name");
-    String fullPath = "/" + filename; 
-
-    if (fullPath == "/config.json" || fullPath == "/wifi_config.json") {
-        if (SPIFFS.exists(fullPath)) {
-            File file = SPIFFS.open(fullPath, "r");
-            if (file) {
-                // Den Dateinamen für den Browser im Header senden (optional, aber nützlich)
-                wm.server->sendHeader("Content-Disposition", "attachment; filename=" + filename);
-                wm.server->streamFile(file, "application/json");
-                file.close();
-                Serial.printf("Served dynamic file: %s via GET parameter.\n", fullPath.c_str());
-            } else {
-                wm.server->send(500, "text/plain", "File could not be opened.");
-            }
-        } else {
-            wm.server->send(404, "text/plain", "File not found on filesystem.");
-        }
-    } else {
-        wm.server->send(403, "text/plain", "Forbidden file name.");
+    else
+    {
+      wm.server->send(404, "text/plain", "File not found on filesystem.");
     }
+  }
+  else
+  {
+    wm.server->send(403, "text/plain", "Forbidden file name.");
+  }
 }
 
 void bindServerCallback()
@@ -85,7 +96,8 @@ void setupMenu()
   wm.setMenu(menu);
 
   const char *menuhtml
-      = "<form action='static/monitor.html' method='get'><button>Monitor</button></form><br/>\n";
+      = "<form action='static/monitor.html' "
+        "method='get'><button>Monitor</button></form><br/>\n";
   wm.setCustomMenuHTML(menuhtml);
 }
 

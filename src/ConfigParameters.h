@@ -3,6 +3,7 @@
 
 #include <WiFiManager.h>
 #include <vector>
+
 #include "WiFiConfig.h"
 
 #define LED_PIN 5
@@ -17,14 +18,28 @@ extern int startAddress;
 extern String deviceName;
 
 // Protocol enum
-enum ProtocolType { PROTO_ARTNET = 0, PROTO_E131 = 1, PROTO_ESPNOW = 2 };
+enum ProtocolType
+{
+  PROTO_ARTNET = 0,
+  PROTO_E131   = 1,
+  PROTO_ESPNOW = 2
+};
 extern ProtocolType protocol;
 
 // Color mode enum
-enum ColorModeType { COLOR_MODE_MULTIPLE = 0, COLOR_MODE_SINGLE = 1 };
+enum ColorModeType
+{
+  COLOR_MODE_MULTIPLE = 0,
+  COLOR_MODE_SINGLE   = 1
+};
 extern ColorModeType colorMode;
 
-enum OutputModeType { OUTPUT_NEOPIXEL = 0, OUTPUT_DMX512 = 1, OUTPUT_ESPNOW = 2 };
+enum OutputModeType
+{
+  OUTPUT_NEOPIXEL = 0,
+  OUTPUT_DMX512   = 1,
+  OUTPUT_ESPNOW   = 2
+};
 extern OutputModeType outputMode;
 
 // WiFiManager custom parameters

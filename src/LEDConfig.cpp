@@ -1,4 +1,5 @@
 #include "LEDConfig.h"
+
 #include "ConfigParameters.h"
 
 #define LED_PIN 16  // Replace or keep depending on your setup
@@ -12,7 +13,8 @@ NeoPixelBus<ActiveNeoFeature, NeoEsp32I2s0Ws2812xMethod>* strip = nullptr;
 
 void setupLEDs()
 {
-  if (strip) delete strip;
+  if (strip)
+    delete strip;
   strip = new NeoPixelBus<ActiveNeoFeature, NeoEsp32I2s0Ws2812xMethod>(numLeds, LED_PIN);
   strip->Begin();
   strip->Show();
@@ -57,7 +59,7 @@ void calculatePowerUsage()
 
   for (int i = 0; i < numLeds; i++)
   {
-    RgbColor color = strip->GetPixelColor(i);
+    RgbColor color   = strip->GetPixelColor(i);
     float redPower   = color.R / 255.0 * RED_POWER;
     float greenPower = color.G / 255.0 * GREEN_POWER;
     float bluePower  = color.B / 255.0 * BLUE_POWER;
@@ -67,4 +69,3 @@ void calculatePowerUsage()
   // Scale by brightness level (which was pre-applied)
   totalPower *= currentBrightness / 255.0;
 }
-
