@@ -23,14 +23,16 @@ And it outputs to:
 ### Wi-Fi Setup with WiFiManager
 
 * Automatic AP mode on first boot
+* Web-based configuration portal
 * Configure:
-
-  * LED count
-  * DMX universe & start address
-  * Output mode
-  * Color mode
+  * Input protocol (Art-Net, sACN/E1.31, DMX_ESPNOW)
+  * DMX universe
   * Device name
+  * Output mode (NeoPixel, DMX512, DMX_ESPNOW)
+  * NeoPixel: LED count and start address
+  * NeoPixel: Color mode (individual or single combined)
 * Settings stored in SPIFFS
+* Over-the-air (OTA) firmware updates
 
 ### Supported Input Protocols
 
@@ -38,7 +40,7 @@ And it outputs to:
 | ---------------- | ----------------------------------------- |
 | **Art-Net**      | Widely used DMX-over-IP lighting protocol |
 | **E1.31 (sACN)** | Efficient streaming ACN protocol          |
-| **DMX_ESPNOW**      | Fast wireless peer-to-peer frame delivery |
+| **DMX_ESPNOW**   | Fast wireless peer-to-peer frame delivery |
 
 ### Output Options
 
@@ -46,7 +48,7 @@ And it outputs to:
 | ------------------ | -------------------------------- |
 | **NeoPixel**       | Drives WS2812/WS2812B LED strips |
 | **DMX512**         | Outputs DMX via UART             |
-| **DMX_ESPNOW Output** | Broadcasts DMX frames wirelessly |
+| **DMX_ESPNOW**     | Broadcasts DMX frames wirelessly |
 
 ## 🗂 Project Structure
 
@@ -63,7 +65,6 @@ And it outputs to:
 * **Sensors/*** — Optional sensor integrations
 * **StatusLED.*** — Diagnostic/status LED handling
 * **interfaces/*** — Clean input/output interface classes
-
 
 ## 🧩 How to Use
 
@@ -82,7 +83,52 @@ And it outputs to:
 
 * **ESP32 board**
 * Optional:
-
   * WS2812/NeoPixel LEDs
-  * RS485 DMX transceiver module (for DMX output)
-  * Additional ESP32 (for DMX_ESPNOW DMX networks)
+  * RS485 DMX transceiver module (for DMX512 output)
+  * Additional ESP32 (for DMX_ESPNOW networks)
+
+## 🔧 Installation
+
+1. Install PlatformIO
+2. Clone this repository
+3. Run `pio run -t upload` to build and upload firmware
+4. Connect to the ESP32 Wi-Fi network on first boot
+5. Configure via web interface
+
+## 🛠 Configuration
+
+The device can be configured through the web interface:
+
+* **Wi-Fi Settings**: Connect to your network
+* **Protocol Selection**: Choose input protocol (Art-Net, sACN/E1.31, DMX_ESPNOW)
+* **Output Mode**: Select output type (NeoPixel, DMX512, DMX_ESPNOW)
+* **LED Configuration**: Set number of LEDs and addressing mode
+* **DMX Settings**: Configure universe and start address
+
+## 📡 Protocols
+
+### Art-Net
+
+Standard DMX-over-IP protocol, widely supported by lighting software.
+
+### sACN / E1.31
+
+ETC's streaming ACN protocol, efficient for multicast DMX distribution.
+
+### DMX_ESPNOW
+
+Custom wireless DMX protocol using ESP-NOW for latency.
+
+## 💡 Outputs
+
+### NeoPixel / WS2812
+
+Direct LED strip control with individual pixel addressing.
+
+### DMX512
+
+Standard professional lighting protocol via RS485 transceiver.
+
+### DMX_ESPNOW
+
+Wireless DMX broadcasting using ESP-NOW for peer-to-peer networks.
