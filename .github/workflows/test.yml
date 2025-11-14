@@ -1,0 +1,69 @@
+name: Run Tests
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'platformio.ini'
+      - 'test/**'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'platformio.ini'
+      - 'test/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            .pio
+          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-pio-
+      
+      - name: Install PlatformIO
+        run: |
+          pip install platformio
+      
+      - name: Install gcovr for coverage
+        run: |
+          pip install gcovr
+      
+      - name: Run tests with coverage
+        run: |
+          pio test -e unit_tests --verbose
+      
+      - name: Generate coverage report
+        run: |
+          gcovr --root . --filter 'src/.*' --xml -o coverage.xml --html-details -o coverage.html
+        continue-on-error: true
+      
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage.xml
+            coverage.html
+            coverage.*.html
+        if: always()
+      
+      - name: Coverage summary
+        run: |
+          gcovr --root . --filter 'src/.*'
+        continue-on-error: true
