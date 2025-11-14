@@ -40,7 +40,7 @@ WiFiManagerParameter custom_colorMode("colorMode",
 WiFiManagerParameter custom_outputMode("outputMode",
                                        "Output Mode",
                                        String(outputMode).c_str(),
-                                       1);  // <-- NEW
+                                       1);
 
 const char *protocolDropdownStr = R"(
   <label for='protocol_dummy'>Protocol</label>
@@ -185,19 +185,19 @@ void loadPreferences()
     protocol     = static_cast<ProtocolType>(json["protocol"] | PROTO_E131);
     colorMode    = static_cast<ColorModeType>(json["colorMode"] | COLOR_MODE_MULTIPLE);
     outputMode
-        = static_cast<OutputModeType>(json["outputMode"] | OUTPUT_NEOPIXEL);  // <-- NEW
+        = static_cast<OutputModeType>(json["outputMode"] | OUTPUT_NEOPIXEL);
   }
   configFile.close();
   Serial.printf(
       "Loaded preferences - numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, "
-      "protocol: %d, colorMode: %d, outputMode: %d\n",  // <-- MODIFIED
+      "protocol: %d, colorMode: %d, outputMode: %d\n",
       numLeds,
       universe,
       startAddress,
       deviceName.c_str(),
       protocol,
       colorMode,
-      outputMode  // <-- MODIFIED
+      outputMode
   );
 }
 
@@ -212,26 +212,26 @@ void savePreferences()
   Serial.println("Saving preferences to SPIFFS...");
   Serial.printf(
       "numLeds: %d, universe: %d, startAddress: %d, deviceName: %s, protocol: %d, "
-      "colorMode: %d, outputMode: %d\n",  // <-- MODIFIED
+      "colorMode: %d, outputMode: %d\n",
       numLeds,
       universe,
       startAddress,
       deviceName.c_str(),
       protocol,
       colorMode,
-      outputMode  // <-- MODIFIED
+      outputMode
   );
 
   configFile.printf(
       "{\"numLeds\": %d, \"universe\": %d, \"startAddress\": %d, \"deviceName\": \"%s\", "
-      "\"protocol\": %d, \"colorMode\": %d, \"outputMode\": %d}\n",  // <-- MODIFIED
+      "\"protocol\": %d, \"colorMode\": %d, \"outputMode\": %d}\n",
       numLeds,
       universe,
       startAddress,
       deviceName.c_str(),
       protocol,
       colorMode,
-      outputMode  // <-- MODIFIED
+      outputMode
   );
   configFile.close();
 }

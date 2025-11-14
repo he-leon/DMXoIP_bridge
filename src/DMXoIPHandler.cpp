@@ -12,11 +12,11 @@ static DMXoIPHandler* currentInstance = nullptr;
 DMXoIPHandler::DMXoIPHandler(IDMXFrameHandler& frameHandler,
                              ArtnetWifi& artnet,
                              ESPAsyncE131& e131,
-                             DMX_ESPNOW& dmxEspNow)  // <-- MODIFIED
+                             DMX_ESPNOW& dmxEspNow)
     : _frameHandler(frameHandler)
     , _artnet(artnet)
     , _e131(e131)
-    , _dmxEspNow(dmxEspNow)  // <-- NEW
+    , _dmxEspNow(dmxEspNow)
 {
   // Set the static instance pointer when the object is created
   currentInstance = this;

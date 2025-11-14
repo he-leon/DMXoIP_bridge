@@ -41,7 +41,7 @@ void setup()
   IDMXFrameHandler* activeHandler             = nullptr;
   NeoPixelDMXFrameHandler* neoPixelHandlerPtr = nullptr;
   SerialDMXFrameHandler* serialDMXHandlerPtr  = nullptr;
-  ESPDMXNowFrameHandler* espDmxNowHandlerPtr  = nullptr;  // <-- NEW
+  ESPDMXNowFrameHandler* espDmxNowHandlerPtr  = nullptr;
 
   if (outputMode == OUTPUT_DMX512)
   {
@@ -51,7 +51,7 @@ void setup()
     activeHandler       = serialDMXHandlerPtr;
   }
   else if (outputMode == OUTPUT_ESPNOW)
-  {  // <-- NEW
+  {
     Serial.println("Using ESP-NOW DMX Frame Handler.");
     if (dmxEspNow.beginSender(1))
     {
@@ -119,7 +119,7 @@ void loop()
   case PROTO_E131:
     dmxoipHandlerPtr->readE131();
     break;
-  case PROTO_ESPNOW:  // <-- NEW
+  case PROTO_ESPNOW:
     dmxoipHandlerPtr->readEspNow();
     break;
   default:
@@ -133,9 +133,7 @@ void loop()
     dmxOutputPtr->sendDMX();
   }
   else if (outputMode == OUTPUT_ESPNOW)
-  {  // <-- NEW
-    // Call the update method for DMX_ESPNOW to handle packet slicing and transmission
-    // timing
+  { 
     dmxEspNow.update();
   }
 

@@ -75,7 +75,7 @@ void saveConfigCallback()
   protocol     = static_cast<ProtocolType>(atoi(custom_protocol.getValue()));
   colorMode    = static_cast<ColorModeType>(atoi(custom_colorMode.getValue()));
   outputMode
-      = static_cast<OutputModeType>(atoi(custom_outputMode.getValue()));  // <-- NEW
+      = static_cast<OutputModeType>(atoi(custom_outputMode.getValue()));
   savePreferences();
   // Restart device to reinitialize with new settings
   restartTimer.once(1, performRestart);
