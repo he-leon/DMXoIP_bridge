@@ -26,11 +26,13 @@ WiFiManagerParameter custom_protocol("protocol", "Protocol", String(protocol).c_
 WiFiManagerParameter custom_colorMode("colorMode", "LED Addressing", String(colorMode).c_str(), 1); 
 WiFiManagerParameter custom_outputMode("outputMode", "Output Mode", String(outputMode).c_str(), 1); // <-- NEW
 
+// --- MODIFIED: Protocol Mode Dropdown ---
 const char *protocolDropdownStr = R"(
   <label for='protocol_dummy'>Protocol</label>
   <select name='protocol_dummy' id='protocol_dummy' class='button'>
     <option value='0'>ArtNet</option>
     <option value='1'>E1.31</option>
+    <option value='2'>ESP-NOW</option>
   </select>
 )";
 WiFiManagerParameter custom_protocol_select(protocolDropdownStr);
@@ -50,6 +52,7 @@ const char *outputModeDropdownStr = R"(
   <select name='outputMode_dummy' id='outputMode_dummy' class='button'>
     <option value='0'>NeoPixel</option>
     <option value='1'>DMX512</option>
+    <option value='2'>ESP-NOW</option>
   </select>
 )";
 WiFiManagerParameter custom_outputMode_select(outputModeDropdownStr);

@@ -10,6 +10,7 @@
 
 ArtnetWifi artnet;  
 ESPAsyncE131 e131;  
+DMX_ESPNOW dmxEspNow; 
 
 MockDMXFrameHandler mockFrameHandler;
 DMXoIPHandler* handler = nullptr;
@@ -30,7 +31,7 @@ void setUp(void) {
     artnet.beginCalled = false;
     artnet.storedCallback = nullptr;
 
-    handler = new DMXoIPHandler(mockFrameHandler, artnet, e131);
+    handler = new DMXoIPHandler(mockFrameHandler, artnet, e131, dmxEspNow);
 }
 
 void tearDown(void) {

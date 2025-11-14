@@ -4,6 +4,7 @@
 #include "ArduinoFake.h"
 
 #define E131_MULTICAST 0
+#define DMX_UNIVERSE_SIZE 512
 
 // --- ArtnetWifi Mock ---
 
@@ -52,6 +53,47 @@ public:
             return true;
         }
         return false;
+    }
+};
+
+// --- DMX_ESPNOW Mock ---
+
+class DMX_ESPNOW {
+public:
+    bool beginSenderCalled = false;
+    bool beginSenderReturnValue = true;
+    uint8_t dmxBuffer[DMX_UNIVERSE_SIZE] = {0};
+    uint8_t receiveUniverseId = 0;
+
+    bool beginSender(uint8_t channel) {
+        beginSenderCalled = true;
+        return beginSenderReturnValue;
+    }
+
+    bool beginReceiver(void (*callback)(uint8_t universeId)) {
+        return true; // Assume success for mock
+    }
+
+    void setChannels(uint16_t startChannel, uint8_t* values, uint16_t count) {
+        for (uint16_t i = 0; i < count && (startChannel + i) < DMX_UNIVERSE_SIZE; i++) {
+            dmxBuffer[startChannel + i] = values[i];
+        }
+    }
+
+    void sendFrame() {
+        // No-op for now
+    }
+
+    uint8_t* getDMXBuffer() {
+        return dmxBuffer;
+    }
+
+    void setReceiveUniverseId(uint8_t universeId) {
+        receiveUniverseId = universeId;
+    }
+
+    void update() {
+        // No-op for now
     }
 };
 
