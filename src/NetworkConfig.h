@@ -1,8 +1,6 @@
 #ifndef NETWORKCONFIG_H
 #define NETWORKCONFIG_H
 
-#include "ConfigParameters.h"
-
 void setupWiFiManager();
 void setupOTA();
 void handleWiFiManager();

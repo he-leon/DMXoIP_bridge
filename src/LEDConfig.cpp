@@ -12,7 +12,7 @@ NeoPixelBus<ActiveNeoFeature, NeoEsp32I2s0Ws2812xMethod>* strip = nullptr;
 
 void setupLEDs()
 {
-  if (strip) delete strip;  // Clean up if recreating
+  if (strip) delete strip;
   strip = new NeoPixelBus<ActiveNeoFeature, NeoEsp32I2s0Ws2812xMethod>(numLeds, LED_PIN);
   strip->Begin();
   strip->Show();
@@ -33,8 +33,8 @@ void setLEDColor(RgbColor color)
 
 void setBrightness(uint8_t brightness)
 {
-  currentBrightness = brightness;
   // Brightness is applied during setLEDColor() via Dim()
+  currentBrightness = brightness;
 }
 
 void blinkGreenTwice()
@@ -66,9 +66,5 @@ void calculatePowerUsage()
 
   // Scale by brightness level (which was pre-applied)
   totalPower *= currentBrightness / 255.0;
-
-  // Serial.print("Current power usage: ");
-  // Serial.print(totalPower);
-  // Serial.println(" W");
 }
 

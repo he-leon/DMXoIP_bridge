@@ -69,7 +69,6 @@ void NeoPixelDMXFrameHandler::handleFrame(uint16_t universeIn, uint16_t length, 
         strip->Show();
     }
 
-    // Power calculation (moved from DMXoIPHandler)
     if (millis() - lastPowerCalc > 1000) { 
         calculatePowerUsage(); 
         lastPowerCalc = millis(); 

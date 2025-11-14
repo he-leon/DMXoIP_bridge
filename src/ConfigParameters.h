@@ -24,7 +24,6 @@ extern ProtocolType protocol;
 enum ColorModeType { COLOR_MODE_MULTIPLE = 0, COLOR_MODE_SINGLE = 1 };
 extern ColorModeType colorMode;
 
-// --- NEW: Output mode enum ---
 enum OutputModeType { OUTPUT_NEOPIXEL = 0, OUTPUT_DMX512 = 1, OUTPUT_ESPNOW = 2 };
 extern OutputModeType outputMode;
 
@@ -37,8 +36,8 @@ extern WiFiManagerParameter custom_protocol;
 extern WiFiManagerParameter custom_protocol_select;
 extern WiFiManagerParameter custom_colorMode;
 extern WiFiManagerParameter custom_colorMode_select;
-extern WiFiManagerParameter custom_outputMode; // <-- NEW
-extern WiFiManagerParameter custom_outputMode_select; // <-- NEW
+extern WiFiManagerParameter custom_outputMode;
+extern WiFiManagerParameter custom_outputMode_select;
 
 void initializePreferences();
 void loadPreferences();

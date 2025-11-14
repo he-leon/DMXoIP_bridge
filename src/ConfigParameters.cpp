@@ -11,7 +11,7 @@ String deviceName = defaultDeviceName;
 
 ProtocolType protocol = PROTO_E131;
 ColorModeType colorMode = COLOR_MODE_MULTIPLE;
-OutputModeType outputMode = OUTPUT_NEOPIXEL; // <-- NEW: Default to NeoPixel
+OutputModeType outputMode = OUTPUT_NEOPIXEL;
 
 const char *configFilePath = "/config.json";
 const char *wifiConfigFilePath = "/wifi_config.json";
@@ -26,7 +26,6 @@ WiFiManagerParameter custom_protocol("protocol", "Protocol", String(protocol).c_
 WiFiManagerParameter custom_colorMode("colorMode", "LED Addressing", String(colorMode).c_str(), 1); 
 WiFiManagerParameter custom_outputMode("outputMode", "Output Mode", String(outputMode).c_str(), 1); // <-- NEW
 
-// --- MODIFIED: Protocol Mode Dropdown ---
 const char *protocolDropdownStr = R"(
   <label for='protocol_dummy'>Protocol</label>
   <select name='protocol_dummy' id='protocol_dummy' class='button'>
@@ -46,7 +45,6 @@ const char *colorModeDropdownStr = R"(
 )";
 WiFiManagerParameter custom_colorMode_select(colorModeDropdownStr);
 
-// --- NEW: Output Mode Dropdown ---
 const char *outputModeDropdownStr = R"(
   <label for='outputMode_dummy'>Output Mode</label>
   <select name='outputMode_dummy' id='outputMode_dummy' class='button'>

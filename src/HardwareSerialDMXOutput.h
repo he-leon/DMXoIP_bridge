@@ -1,7 +1,7 @@
 #ifndef HARDWARE_SERIAL_DMX_OUTPUT_H
 #define HARDWARE_SERIAL_DMX_OUTPUT_H
 #define MIN_FRAME_INTERVAL_MS 30
-#define MAX_DMX_SLOTS 512 // Define max slots for the buffer
+#define MAX_DMX_SLOTS 512
 
 #include "interfaces/IDMXOutput.h"
 #include <Arduino.h>
@@ -23,9 +23,8 @@ private:
     static constexpr uint16_t DMX_MAB_TIME_US   = 12;
     static constexpr long DMX_BAUD_RATE = 250000;
     
-    // --- New Members for Buffering ---
-    uint8_t _dmxBuffer[MAX_DMX_SLOTS + 1]; // +1 for Start Code if we buffer it, but usually for up to 512 slots (1-512)
-    uint16_t _dmxLength = 0; // The actual number of slots (1 to 512)
+    uint8_t _dmxBuffer[MAX_DMX_SLOTS + 1];
+    uint16_t _dmxLength = 0;
 };
 
 #endif // HARDWARE_SERIAL_DMX_OUTPUT_H

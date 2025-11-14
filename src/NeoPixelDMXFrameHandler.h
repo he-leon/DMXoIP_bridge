@@ -5,16 +5,10 @@
 #include <NeoPixelBus.h>
 #include "interfaces/IDMXFrameHandler.h" // <-- Include the new interface
 
-/**
- * @brief Handles DMX frame processing specifically for NeoPixelBus (WS2812B) strips.
- */
 class NeoPixelDMXFrameHandler : public IDMXFrameHandler { // <-- Implement the interface
 public:
     NeoPixelDMXFrameHandler();
     
-    /**
-     * @brief Processes the DMX data and updates the LED strip.
-     */
     void handleFrame(uint16_t universeIn, uint16_t length, uint8_t* data) override;
     int getFrameRate() const override;
 

@@ -10,21 +10,16 @@
 
 Ticker restartTimer;
 
-#include "Sensors.h"
 #define WM_DEBUG_LEVEL DEBUG_VERBOSE
 
 WiFiManager wm;
 
 void performRestart() { ESP.restart(); }
 
-// In NetworkConfig.cpp or a similar file
-// In NetworkConfig.cpp
 
 void handleFileDownload() {
-    // wm.server ist global nach bindServerCallback verfügbar
     if (!wm.server) return; 
 
-    // ✅ NEU: Dateinamen aus dem GET-Parameter 'name' abrufen
     if (!wm.server->hasArg("name")) {
         wm.server->send(400, "text/plain", "Error: Missing 'name' parameter.");
         return;
@@ -33,7 +28,6 @@ void handleFileDownload() {
     String filename = wm.server->arg("name");
     String fullPath = "/" + filename; 
 
-    // Security check: Nur die beiden Konfigurationsdateien zulassen
     if (fullPath == "/config.json" || fullPath == "/wifi_config.json") {
         if (SPIFFS.exists(fullPath)) {
             File file = SPIFFS.open(fullPath, "r");
@@ -53,65 +47,10 @@ void handleFileDownload() {
         wm.server->send(403, "text/plain", "Forbidden file name.");
     }
 }
-// This is the function called when a file chunk arrives
-void handleFileUpload()
-{
-  if (!wm.server)
-    return;
-
-  HTTPUpload &upload = wm.server->upload();
-  static File configFile;
-
-  if (upload.status == UPLOAD_FILE_START)
-  {
-    // Start of upload: Get the original filename from the Python script's request
-    String fullPath = "/" + upload.filename;
-
-    // Open the file for writing
-    configFile = SPIFFS.open(fullPath, "w");
-    if (!configFile)
-    {
-      Serial.println("Failed to open file for writing!");
-      return;
-    }
-    Serial.printf("Starting upload of %s\n", fullPath.c_str());
-  }
-  else if (upload.status == UPLOAD_FILE_WRITE)
-  {
-    // Write the chunk of data
-    if (configFile)
-    {
-      configFile.write(upload.buf, upload.currentSize);
-    }
-  }
-  else if (upload.status == UPLOAD_FILE_END)
-  {
-    // End of upload: Close the file and respond
-    if (configFile)
-    {
-      configFile.close();
-    }
-
-    Serial.println("Upload complete. Responding OK.");
-    // We must send a response back to the client (Python script) immediately
-    wm.server->send(200, "text/plain", "Upload OK");
-
-    // Schedule a restart *after* the response has been sent
-    // Using the Ticker/performRestart logic you already implemented
-    Serial.println("Scheduling restart in 3 seconds to load new config...");
-    restartTimer.once(3, performRestart);
-  }
-  // UPLOAD_FILE_ABORTED is another status you might check
-}
 
 void bindServerCallback()
 {
   wm.server->on("/downloadfile", HTTP_GET, handleFileDownload);
-  wm.server->on(
-      "/upload_config",
-      HTTP_POST,
-      []() { wm.server->send(200, "text/plain", "Processing upload..."); },
-      handleFileUpload);
   wm.server->serveStatic("/static", SPIFFS, "/static");
 }
 
@@ -133,7 +72,6 @@ void saveConfigCallback()
 
 void setupMenu()
 {
-  // ... (menu setup unchanged) ...
   std::vector<const char *> menu = {"wifi",
                                     "info",
                                     "param",
@@ -189,7 +127,6 @@ void setupWiFiManager()
   WiFi.setSleep(false);
   WiFi.hostname(deviceName.c_str());
 
-  // ✅ JS to sync dropdowns AND show/hide NeoPixel-specific fields
   const char *headhtml = R"rawliteral(
     <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -265,7 +202,6 @@ void setupWiFiManager()
 
   Serial.println("Connecting to saved Wi-Fi networks...");
 
-  // ... (rest of WiFi connection logic unchanged) ...
   // Sort by priority (high → low)
   std::sort(wifiConfigs.begin(),
             wifiConfigs.end(),
@@ -334,7 +270,6 @@ void setupWiFiManager()
 
 void setupOTA()
 {
-  // ... (OTA setup unchanged) ...
   ArduinoOTA.setHostname(deviceName.c_str());
 
   ArduinoOTA.onStart([]() { Serial.println("Start updating"); });

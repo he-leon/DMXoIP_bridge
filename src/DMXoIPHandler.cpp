@@ -23,15 +23,9 @@ DMXoIPHandler::DMXoIPHandler(IDMXFrameHandler& frameHandler,
 }
 
 bool DMXoIPHandler::isReceiving() const {
-    // Check if any protocol is actively receiving
-    // For Art-Net/E1.31, use lastPacketTime.
-    // For ESP-NOW, we rely on the library's internal check or its last frame time.
-    // We'll use the generic lastPacketTime updated in processFrame.
     return (millis() - lastPacketTime) < PACKET_TIMEOUT_MS;
 }
 
-// ----------------- DMX Frame Processing Proxy -----------------
-// This method is called by the Art-Net, E1.31, and DMX_ESPNOW receivers
 void DMXoIPHandler::processFrame(uint16_t universeIn, uint16_t length, uint8_t sequence, uint8_t* data) {
     lastPacketTime = millis();
     
@@ -108,10 +102,5 @@ void DMXoIPHandler::setupEspNowReceiver() {
 }
 
 void DMXoIPHandler::readEspNow() {
-    // DMX_ESPNOW handles receiving data in its internal interrupt/callback logic.
-    // The library's `update` method is mainly used by the sender for timing, 
-    // but the library structure may require a call here for statistics or internal processing.
-    // Based on the library, it seems receive is mostly interrupt-driven, 
-    // but calling `update()` is a safe bet if there's no explicit `read()` or similar method.
-    // For now, leave empty as frame processing is done via the callback.
+    _dmxEspNow.update();
 }
