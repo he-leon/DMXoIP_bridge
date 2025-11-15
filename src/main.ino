@@ -131,9 +131,10 @@ void loop()
   if (outputMode == OUTPUT_DMX512 && dmxOutputPtr)
   {
     dmxOutputPtr->sendDMX();
+    dmxOutputPtr->updatePersistence();
   }
   else if (outputMode == OUTPUT_ESPNOW)
-  { 
+  {
     dmxEspNow.update();
   }
 
