@@ -18,6 +18,11 @@ void performRestart() { ESP.restart(); }
 
 void handleFileDownload()
 {
+#ifndef ENABLE_CONFIG_DOWNLOAD
+  wm.server->send(400, "text/plain", "Feature not enabled on this build.");
+  return;
+#endif
+
   if (!wm.server)
     return;
 
