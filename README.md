@@ -10,13 +10,13 @@ The ESP32 acts as a DMX-over-IP receiver and lighting controller. It can receive
 
 * **Art-Net**
 * **sACN / E1.31**
-* **DMX_ESPNOW (wireless, low-latency)**
+* **DMX_ESPNOW (wireless, low-latency, experimental)**
 
 And it outputs to:
 
 * **NeoPixel / WS2812 LEDs**
 * **DMX512 (hardware serial)**
-* **DMX_ESPNOW broadcast**
+* **DMX_ESPNOW (experimental)**
 
 ## Features
 
@@ -40,7 +40,7 @@ And it outputs to:
 | ---------------- | ----------------------------------------- |
 | **Art-Net**      | Widely used DMX-over-IP lighting protocol |
 | **E1.31 (sACN)** | Efficient streaming ACN protocol          |
-| **DMX_ESPNOW**   | Fast wireless peer-to-peer frame delivery |
+| **DMX_ESPNOW (experimental)**   | Fast wireless peer-to-peer frame delivery |
 
 ### Output Options
 
@@ -48,7 +48,7 @@ And it outputs to:
 | ------------------ | -------------------------------- |
 | **NeoPixel**       | Drives WS2812/WS2812B LED strips |
 | **DMX512**         | Outputs DMX via UART             |
-| **DMX_ESPNOW**     | Broadcasts DMX frames wirelessly |
+| **DMX_ESPNOW (experimental)**     | Broadcasts DMX frames wirelessly |
 
 ## Project Structure
 
@@ -158,9 +158,11 @@ Standard DMX-over-IP protocol, widely supported by lighting software.
 
 ETC's streaming ACN protocol, efficient for multicast DMX distribution.
 
-### DMX_ESPNOW
+### DMX_ESPNOW (experimental)
 
 Custom wireless DMX protocol using ESP-NOW for latency.
+
+See [Security notice](https://github.com/he-leon/esp_dmxnow?tab=readme-ov-file#security-notice) if you want to use this.
 
 ## Outputs
 
@@ -172,6 +174,8 @@ Direct LED strip control with individual pixel addressing.
 
 Standard professional lighting protocol via RS485 transceiver.
 
-### DMX_ESPNOW
+### DMX_ESPNOW (experimental)
 
 Wireless DMX broadcasting using ESP-NOW for peer-to-peer networks.
+
+See [Security notice](https://github.com/he-leon/esp_dmxnow?tab=readme-ov-file#security-notice) if you want to use this.
