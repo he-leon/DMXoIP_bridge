@@ -69,7 +69,7 @@ And it outputs to:
 ## How to Use
 
 1. Flash the firmware onto an **ESP32**.
-2. On first boot, connect to the ESP32 Wi-Fi AP.
+2. On first boot, connect to the ESP32 Wi-Fi AP (default password: dmxbridge).
 3. Open the configuration portal.
 4. Set:
    * Wi-Fi credentials

@@ -252,7 +252,7 @@ void setupWiFiManager()
           [](WiFiManager *myWiFiManager)
           { Serial.println("Started non-blocking webinterface in STA mode."); });
       wm.setConfigPortalBlocking(false);
-      wm.startConfigPortal(deviceName.c_str());
+      wm.startWebPortal();
 
       if (!MDNS.begin(deviceName.c_str()))
         Serial.println("Error setting up MDNS responder!");
@@ -282,7 +282,7 @@ void setupWiFiManager()
         setLEDColor(RgbColor(0, 0, 255));  // Blue
       });
 
-  wm.startConfigPortal(deviceName.c_str());
+  wm.startConfigPortal(deviceName.c_str(), "dmxbridge");
 }
 
 void setupOTA()
